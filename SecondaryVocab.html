@@ -1,0 +1,2571 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>⭐ 英語初中測驗遊戲 ⭐</title>
+<style>
+  html, body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: "Comic Sans MS", sans-serif;
+    background: linear-gradient(180deg, #a8e0ff, #8ee3f5, #f9f9f9);
+    transition: background 1s ease;
+    position: relative;
+  }
+  @keyframes twinkle {
+    0%,100% { opacity: 0.3; transform: scale(1);}
+    50% { opacity: 1; transform: scale(1.3);}
+  }
+  .star {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: #fffbd1;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #fff;
+    animation: twinkle 2.5s infinite;
+  }
+  #game-container {
+    width: 90%;
+    max-width: 1200px;
+    min-height: 600px;
+    background: rgba(255,255,255,0.92);
+    border-radius: 25px;
+    box-shadow: 0 0 35px rgba(0, 150, 255, 0.6);
+    padding: 30px;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+    overflow-y: auto;
+    max-height: 90vh;
+  }
+  h1, h2 {
+    color: #005bbb;
+    text-shadow: 0 0 8px #ffb347;
+    margin-bottom: 20px;
+  }
+  button {
+    background: linear-gradient(90deg, #ffd861, #ffb347);
+    color: #002244;
+    border: none;
+    border-radius: 16px;
+    padding: 15px 30px;
+    font-size: 22px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.25s ease, box-shadow 0.3s ease;
+    margin: 10px;
+  }
+  button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 15px #ffaa00;
+  }
+  button:disabled {
+    background: #cccccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+  .option {
+    display: block;
+    width: 90%;
+    margin: 20px auto;
+    font-size: 24px;
+  }
+  .hidden { display: none; }
+  #question {
+    font-size: 32px;
+    font-weight: bold;
+    margin: 20px 0;
+    color: #002266;
+    min-height: 60px;
+  }
+  #result {
+    margin-top: 20px;
+    font-weight: bold;
+    font-size: 22px;
+    color: #ff6600;
+    min-height: 40px;
+  }
+  #scoreboard {
+    margin-top: 15px;
+    font-size: 20px;
+    color: #0077cc;
+  }
+  .wrong-list-style {
+    background: rgba(255, 240, 240, 0.8);
+    border: 2px dashed #ff6666;
+    border-radius: 15px;
+    padding: 20px;
+    margin: 20px auto;
+    width: 90%;
+    max-height: 200px;
+    overflow-y: auto;
+    text-align: left;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #333;
+  }
+  .category-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    margin: 30px 0;
+  }
+  .category-card {
+    background: rgba(255, 255, 255, 0.9);
+    border: 3px solid #4CAF50;
+    border-radius: 15px;
+    padding: 20px;
+    width: 250px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+  .category-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  }
+  .category-card.selected {
+    background: linear-gradient(135deg, #4CAF50, #8BC34A);
+    color: white;
+    border-color: #388E3C;
+  }
+  .category-card h3 {
+    margin: 0 0 10px 0;
+    color: #2E7D32;
+  }
+  .category-card.selected h3 {
+    color: white;
+  }
+  .category-card p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #666;
+  }
+  .category-card.selected p {
+    color: rgba(255,255,255,0.9);
+  }
+  .category-checkbox {
+    display: none;
+  }
+  .selection-info {
+    background: #e3f2fd;
+    border-radius: 10px;
+    padding: 15px;
+    margin: 20px 0;
+    font-size: 18px;
+    color: #1565c0;
+  }
+  .category-stats {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px 0;
+    flex-wrap: wrap;
+  }
+  .stat-item {
+    background: #f5f5f5;
+    border-radius: 10px;
+    padding: 10px 20px;
+    margin: 5px;
+    font-size: 16px;
+  }
+  #category-screen {
+    text-align: center;
+  }
+  #selected-count {
+    font-weight: bold;
+    color: #d32f2f;
+    font-size: 1.2em;
+  }
+</style>
+</head>
+<body>
+  <div class="star" style="top:10%;left:15%;animation-delay:0s;"></div>
+  <div class="star" style="top:25%;left:55%;animation-delay:1s;"></div>
+  <div class="star" style="top:70%;left:35%;animation-delay:0.5s;"></div>
+  <div class="star" style="top:80%;left:80%;animation-delay:1.2s;"></div>
+  <div class="star" style="top:50%;left:10%;animation-delay:0.8s;"></div>
+  
+  <div id="game-container">
+    <!-- 開始畫面 -->
+    <div id="start-screen">
+      <h1>⭐ 英語初中測驗遊戲 ⭐</h1>
+      <p style="font-size: 20px; color: #555; margin-bottom: 30px;">選擇您想要練習的單詞類別，開始挑戰！</p>
+      <button id="start-btn">開始選擇類別</button>
+    </div>
+    <!-- 分類選擇畫面 -->
+    <div id="category-screen" class="hidden">
+      <h2>🎯 選擇測驗類別</h2>
+      <p style="font-size: 18px; color: #666; margin-bottom: 20px;">請選擇至少一個類別（可多選），系統將從選擇的類別中隨機抽取10題</p>
+      
+      <div class="selection-info">
+        已選擇：<span id="selected-count">0</span> 個類別
+      </div>
+      <div class="category-container">
+        <!-- 類別1：日常生活 -->
+        <div class="category-card" onclick="toggleCategory(1)">
+          <input type="checkbox" class="category-checkbox" id="category1" data-category="1">
+          <h3>🏠 初中嘅生活單詞</h3>
+          <p>• 社會</p>
+          <p>• 時事</p>
+          <p>• 術語</p>
+          <p>📊 共10題</p>
+        </div>
+       
+      </div>
+      <div class="category-stats">
+        <div class="stat-item">總題庫：500題</div>
+        <div class="stat-item">每場測驗：10題</div>
+        <div class="stat-item">可多類別組合</div>
+      </div>
+      <button id="start-quiz-btn" disabled>開始測驗 🚀</button>
+      <button onclick="showScreen('start-screen')">返回主頁</button>
+    </div>
+    <!-- 測驗畫面 -->
+    <div id="quiz-screen" class="hidden">
+      <div id="question"></div>
+      <button id="speak-word">🔊 朗讀題目</button>
+      <div id="options"></div>
+      <div id="result"></div>
+      <div id="scoreboard"></div>
+      <button id="next-btn" class="hidden">下一題 ➡️</button>
+    </div>
+    <!-- 結束畫面 -->
+    <div id="end-screen" class="hidden">
+      <h2>🎉 遊戲完結！ 🎉</h2>
+      <p id="final-score"></p>
+      <p id="wrong-list" class="wrong-list-style"></p>
+      <button onclick="showScreen('category-screen')">再玩一次</button>
+      <button onclick="showScreen('start-screen')">返回主頁</button>
+    </div>
+  </div>
+<script>
+// 完整的50個單詞測驗題庫，分為5個類別
+const quizQuestions = {
+  // 類別1：日常生活單詞 (520題)
+  category1: [
+
+{
+"question": "adolescence",
+"options": ["A. 青春期", "B. 青少年", "C. 成年", "D. 童年"],
+"correctAnswer": "A. 青春期"
+},
+{
+"question": "turbulent",
+"options": ["A. 動蕩", "B. 平靜", "C. 溫和", "D. 穩定"],
+"correctAnswer": "A. 動蕩"
+},
+{
+"question": "reckless",
+"options": ["A. 魯莽", "B. 謹慎", "C. 細心", "D. 審慎"],
+"correctAnswer": "A. 魯莽"
+},
+{
+"question": "reinforce",
+"options": ["A. 加強", "B. 削弱", "C. 摧毀", "D. 減少"],
+"correctAnswer": "A. 加強"
+},
+{
+"question": "generalize",
+"options": ["A. 歸納", "B. 具體", "C. 詳述", "D. 細分"],
+"correctAnswer": "A. 歸納"
+},
+{
+"question": "crisis",
+"options": ["A. 危機", "B. 機遇", "C. 平靜", "D. 穩定"],
+"correctAnswer": "A. 危機"
+},
+{
+"question": "rewarding",
+"options": ["A. 值得", "B. 無價", "C. 浪費", "D. 徒勞"],
+"correctAnswer": "A. 值得"
+},
+{
+"question": "resolve",
+"options": ["A. 解決", "B. 製造", "C. 加劇", "D. 忽視"],
+"correctAnswer": "A. 解決"
+},
+{
+"question": "conflicts",
+"options": ["A. 衝突", "B. 和諧", "C. 合作", "D. 團結"],
+"correctAnswer": "A. 衝突"
+},
+{
+"question": "oversee",
+"options": ["A. 監督", "B. 服從", "C. 聽命", "D. 執行"],
+"correctAnswer": "A. 監督"
+},
+{
+"question": "propose",
+"options": ["A. 提議", "B. 否決", "C. 反對", "D. 駁斥"],
+"correctAnswer": "A. 提議"
+},
+{
+"question": "transportation",
+"options": ["A. 運輸", "B. 通訊", "C. 傳播", "D. 運營"],
+"correctAnswer": "A. 運輸"
+},
+{
+"question": "solutions",
+"options": ["A. 解決", "B. 問題", "C. 困難", "D. 挑戰"],
+"correctAnswer": "A. 解決"
+},
+{
+"question": "technology",
+"options": ["A. 技術", "B. 科學", "C. 工程", "D. 工藝"],
+"correctAnswer": "A. 技術"
+},
+{
+"question": "productivity",
+"options": ["A. 生產", "B. 產量", "C. 效率", "D. 產出"],
+"correctAnswer": "A. 生產"
+},
+{
+"question": "expand",
+"options": ["A. 擴張", "B. 收縮", "C. 壓縮", "D. 縮小"],
+"correctAnswer": "A. 擴張"
+},
+{
+"question": "investigation",
+"options": ["A. 調查", "B. 研究", "C. 實驗", "D. 觀察"],
+"correctAnswer": "A. 調查"
+},
+{
+"question": "congestion",
+"options": ["A. 擁堵", "B. 空曠", "C. 疏鬆", "D. 通暢"],
+"correctAnswer": "A. 擁堵"
+},
+{
+"question": "essential",
+"options": ["A. 必要", "B. 次要", "C. 無關", "D. 多餘"],
+"correctAnswer": "A. 必要"
+},
+{
+"question": "eruption",
+"options": ["A. 噴發", "B. 沉澱", "C. 積累", "D. 凝聚"],
+"correctAnswer": "A. 噴發"
+},
+{
+"question": "earthquake",
+"options": ["A. 地震", "B. 海嘯", "C. 颶風", "D. 洪水"],
+"correctAnswer": "A. 地震"
+},
+{
+"question": "unstable",
+"options": ["A. 不穩", "B. 穩定", "C. 堅固", "D. 牢固"],
+"correctAnswer": "A. 不穩"
+},
+{
+"question": "explosion",
+"options": ["A. 爆炸", "B. 燃燒", "C. 熄滅", "D. 點燃"],
+"correctAnswer": "A. 爆炸"
+},
+{
+"question": "ferocity",
+"options": ["A. 殘酷", "B. 溫和", "C. 柔軟", "D. 輕柔"],
+"correctAnswer": "A. 殘酷"
+},
+{
+"question": "geologist",
+"options": ["A. 地質", "B. 生物", "C. 化學", "D. 物理"],
+"correctAnswer": "A. 地質"
+},
+{
+"question": "preserve",
+"options": ["A. 保護", "B. 開發", "C. 建設", "D. 規劃"],
+"correctAnswer": "A. 保護"
+},
+{
+"question": "flourish",
+"options": ["A. 繁榮", "B. 衰退", "C. 枯萎", "D. 衰落"],
+"correctAnswer": "A. 繁榮"
+},
+{
+"question": "aftermath",
+"options": ["A. 餘波", "B. 前因", "C. 結果", "D. 影響"],
+"correctAnswer": "A. 餘波"
+},
+{
+"question": "survivor",
+"options": ["A. 倖存", "B. 遇難", "C. 受害", "D. 犧牲"],
+"correctAnswer": "A. 倖存"
+},
+{
+"question": "ecosystem",
+"options": ["A. 生態", "B. 環境", "C. 生物", "D. 自然"],
+"correctAnswer": "A. 生態"
+},
+{
+"question": "emotion",
+"options": ["A. 情緒", "B. 情感", "C. 心情", "D. 心境"],
+"correctAnswer": "A. 情緒"
+},
+{
+"question": "complexities",
+"options": ["A. 復雜", "B. 簡單", "C. 單一", "D. 純潔"],
+"correctAnswer": "A. 復雜"
+},
+{
+"question": "arousal",
+"options": ["A. 喚起", "B. 抑制", "C. 壓制", "D. 約束"],
+"correctAnswer": "A. 喚起"
+},
+{
+"question": "drawback",
+"options": ["A. 缺點", "B. 優點", "C. 長處", "D. 好處"],
+"correctAnswer": "A. 缺點"
+},
+{
+"question": "depression",
+"options": ["A. 抑鬱", "B. 興奮", "C. 高興", "D. 喜悅"],
+"correctAnswer": "A. 抑鬱"
+},
+{
+"question": "encode",
+"options": ["A. 編碼", "B. 解碼", "C. 加密", "D. 解密"],
+"correctAnswer": "A. 編碼"
+},
+{
+"question": "autobiographies",
+"options": ["A. 自傳", "B. 傳記", "C. 小說", "D. 散文"],
+"correctAnswer": "A. 自傳"
+},
+{
+"question": "ambitious",
+"options": ["A. 抱負", "B. 懶惰", "C. 平庸", "D. 消極"],
+"correctAnswer": "A. 抱負"
+},
+{
+"question": "analyze",
+"options": ["A. 分析", "B. 綜合", "C. 總結", "D. 忽略"],
+"correctAnswer": "A. 分析"
+},
+{
+"question": "approach",
+"options": ["A. 方法", "B. 結束", "C. 放棄", "D. 逃避"],
+"correctAnswer": "A. 方法"
+},
+{
+"question": "assess",
+"options": ["A. 評估", "B. 忽視", "C. 誇大", "D. 貶低"],
+"correctAnswer": "A. 評估"
+},
+{
+"question": "assist",
+"options": ["A. 協助", "B. 阻礙", "C. 反對", "D. 漠視"],
+"correctAnswer": "A. 協助"
+},
+{
+"question": "assume",
+"options": ["A. 假設", "B. 否認", "C. 質疑", "D. 驗證"],
+"correctAnswer": "A. 假設"
+},
+{
+"question": "authority",
+"options": ["A. 權威", "B. 服從", "C. 軟弱", "D. 無能"],
+"correctAnswer": "A. 權威"
+},
+{
+"question": "available",
+"options": ["A. 可獲", "B. 稀缺", "C. 昂貴", "D. 廉價"],
+"correctAnswer": "A. 可獲"
+},
+{
+"question": "avoid",
+"options": ["A. 避免", "B. 面對", "C. 接受", "D. 迎接"],
+"correctAnswer": "A. 避免"
+},
+{
+"question": "beneficial",
+"options": ["A. 有益", "B. 有害", "C. 無用", "D. 危險"],
+"correctAnswer": "A. 有益"
+},
+{
+"question": "budget",
+"options": ["A. 預算", "B. 開支", "C. 收入", "D. 儲蓄"],
+"correctAnswer": "A. 預算"
+},
+{
+"question": "challenge",
+"options": ["A. 挑戰", "B. 支持", "C. 幫助", "D. 鼓勵"],
+"correctAnswer": "A. 挑戰"
+},
+{
+"question": "circumstance",
+"options": ["A. 情況", "B. 原因", "C. 結果", "D. 影響"],
+"correctAnswer": "A. 情況"
+},
+{
+"question": "clarify",
+"options": ["A. 澄清", "B. 混淆", "C. 隱瞞", "D. 誤導"],
+"correctAnswer": "A. 澄清"
+},
+{
+"question": "collaborate",
+"options": ["A. 合作", "B. 競爭", "C. 對抗", "D. 分離"],
+"correctAnswer": "A. 合作"
+},
+{
+"question": "collect",
+"options": ["A. 收集", "B. 分散", "C. 丟棄", "D. 浪費"],
+"correctAnswer": "A. 收集"
+},
+{
+"question": "commit",
+"options": ["A. 承諾", "B. 背棄", "C. 逃避", "D. 否認"],
+"correctAnswer": "A. 承諾"
+},
+{
+"question": "communicate",
+"options": ["A. 溝通", "B. 隔絕", "C. 爭吵", "D. 誤解"],
+"correctAnswer": "A. 溝通"
+},
+{
+"question": "compare",
+"options": ["A. 比較", "B. 模仿", "C. 復制", "D. 創造"],
+"correctAnswer": "A. 比較"
+},
+{
+"question": "concentrate",
+"options": ["A. 集中", "B. 分散", "C. 放鬆", "D. 懶散"],
+"correctAnswer": "A. 集中"
+},
+{
+"question": "conclude",
+"options": ["A. 總結", "B. 開始", "C. 中斷", "D. 延續"],
+"correctAnswer": "A. 總結"
+},
+{
+"question": "conduct",
+"options": ["A. 實施", "B. 放棄", "C. 阻止", "D. 中斷"],
+"correctAnswer": "A. 實施"
+},
+{
+"question": "confidence",
+"options": ["A. 自信", "B. 自卑", "C. 膽怯", "D. 緊張"],
+"correctAnswer": "A. 自信"
+},
+{
+"question": "confirm",
+"options": ["A. 確認", "B. 否認", "C. 質疑", "D. 猜測"],
+"correctAnswer": "A. 確認"
+},
+{
+"question": "consider",
+"options": ["A. 考慮", "B. 忽視", "C. 拒絕", "D. 否認"],
+"correctAnswer": "A. 考慮"
+},
+{
+"question": "consist",
+"options": ["A. 組成", "B. 分解", "C. 毀滅", "D. 創造"],
+"correctAnswer": "A. 組成"
+},
+{
+"question": "construct",
+"options": ["A. 建造", "B. 拆除", "C. 損壞", "D. 廢棄"],
+"correctAnswer": "A. 建造"
+},
+{
+"question": "contribute",
+"options": ["A. 貢獻", "B. 阻礙", "C. 破壞", "D. 浪費"],
+"correctAnswer": "A. 貢獻"
+},
+{
+"question": "control",
+"options": ["A. 控制", "B. 放縱", "C. 無序", "D. 混亂"],
+"correctAnswer": "A. 控制"
+},
+{
+"question": "convince",
+"options": ["A. 說服", "B. 質疑", "C. 反對", "D. 否認"],
+"correctAnswer": "A. 說服"
+},
+{
+"question": "cooperate",
+"options": ["A. 合作", "B. 對抗", "C. 競爭", "D. 分離"],
+"correctAnswer": "A. 合作"
+},
+{
+"question": "correspond",
+"options": ["A. 對應", "B. 矛盾", "C. 衝突", "D. 背離"],
+"correctAnswer": "A. 對應"
+},
+{
+"question": "create",
+"options": ["A. 創造", "B. 毀滅", "C. 破壞", "D. 廢棄"],
+"correctAnswer": "A. 創造"
+},
+{
+"question": "criticize",
+"options": ["A. 批評", "B. 表揚", "C. 鼓勵", "D. 支持"],
+"correctAnswer": "A. 批評"
+},
+{
+"question": "cultivate",
+"options": ["A. 培養", "B. 荒廢", "C. 丟棄", "D. 忽視"],
+"correctAnswer": "A. 培養"
+},
+{
+"question": "decide",
+"options": ["A. 決定", "B. 猶豫", "C. 遲疑", "D. 動搖"],
+"correctAnswer": "A. 決定"
+},
+{
+"question": "declare",
+"options": ["A. 宣佈", "B. 隱瞞", "C. 否認", "D. 謊稱"],
+"correctAnswer": "A. 宣佈"
+},
+{
+"question": "decrease",
+"options": ["A. 減少", "B. 增加", "C. 提升", "D. 擴大"],
+"correctAnswer": "A. 減少"
+},
+{
+"question": "define",
+"options": ["A. 定義", "B. 混淆", "C. 模糊", "D. 隱瞞"],
+"correctAnswer": "A. 定義"
+},
+{
+"question": "demonstrate",
+"options": ["A. 證明", "B. 否認", "C. 隱瞞", "D. 誤導"],
+"correctAnswer": "A. 證明"
+},
+{
+"question": "depend",
+"options": ["A. 依賴", "B. 獨立", "C. 自主", "D. 自強"],
+"correctAnswer": "A. 依賴"
+},
+{
+"question": "describe",
+"options": ["A. 描述", "B. 猜測", "C. 想象", "D. 虛構"],
+"correctAnswer": "A. 描述"
+},
+{
+"question": "develop",
+"options": ["A. 發展", "B. 衰退", "C. 萎縮", "D. 崩潰"],
+"correctAnswer": "A. 發展"
+},
+{
+"question": "determine",
+"options": ["A. 確定", "B. 猶豫", "C. 動搖", "D. 懷疑"],
+"correctAnswer": "A. 確定"
+},
+{
+"question": "differ",
+"options": ["A. 不同", "B. 相同", "C. 一致", "D. 相似"],
+"correctAnswer": "A. 不同"
+},
+{
+"question": "direct",
+"options": ["A. 指導", "B. 間接", "C. 模糊", "D. 隱晦"],
+"correctAnswer": "A. 指導"
+},
+{
+"question": "discover",
+"options": ["A. 發現", "B. 遺忘", "C. 忽視", "D. 丟失"],
+"correctAnswer": "A. 發現"
+},
+{
+"question": "discuss",
+"options": ["A. 討論", "B. 爭吵", "C. 爭辯", "D. 沉默"],
+"correctAnswer": "A. 討論"
+},
+{
+"question": "distinguish",
+"options": ["A. 區分", "B. 混淆", "C. 誤認", "D. 忽視"],
+"correctAnswer": "A. 區分"
+},
+{
+"question": "diverse",
+"options": ["A. 多樣", "B. 單一", "C. 相同", "D. 一致"],
+"correctAnswer": "A. 多樣"
+},
+{
+"question": "dominate",
+"options": ["A. 支配", "B. 服從", "C. 聽命", "D. 依賴"],
+"correctAnswer": "A. 支配"
+},
+{
+"question": "eliminate",
+"options": ["A. 消除", "B. 保留", "C. 增加", "D. 引入"],
+"correctAnswer": "A. 消除"
+},
+{
+"question": "emphasize",
+"options": ["A. 強調", "B. 忽視", "C. 淡化", "D. 隱瞞"],
+"correctAnswer": "A. 強調"
+},
+{
+"question": "employ",
+"options": ["A. 僱用", "B. 解僱", "C. 辭退", "D. 拋棄"],
+"correctAnswer": "A. 僱用"
+},
+{
+"question": "enable",
+"options": ["A. 使能", "B. 阻止", "C. 妨礙", "D. 限制"],
+"correctAnswer": "A. 使能"
+},
+{
+"question": "encourage",
+"options": ["A. 鼓勵", "B. 打擊", "C. 挫敗", "D. 抑制"],
+"correctAnswer": "A. 鼓勵"
+},
+{
+"question": "enhance",
+"options": ["A. 提升", "B. 削弱", "C. 降低", "D. 損害"],
+"correctAnswer": "A. 提升"
+},
+{
+"question": "ensure",
+"options": ["A. 確保", "B. 冒險", "C. 忽視", "D. 放棄"],
+"correctAnswer": "A. 確保"
+},
+{
+"question": "establish",
+"options": ["A. 建立", "B. 摧毀", "C. 廢除", "D. 終止"],
+"correctAnswer": "A. 建立"
+},
+{
+"question": "evaluate",
+"options": ["A. 評價", "B. 忽視", "C. 誇大", "D. 貶低"],
+"correctAnswer": "A. 評價"
+},
+{
+"question": "evolve",
+"options": ["A. 進化", "B. 退化", "C. 停滯", "D. 衰退"],
+"correctAnswer": "A. 進化"
+},
+{
+"question": "examine",
+"options": ["A. 檢查", "B. 忽視", "C. 放棄", "D. 逃避"],
+"correctAnswer": "A. 檢查"
+},
+{
+"question": "example",
+"options": ["A. 例子", "B. 理論", "C. 概念", "D. 抽象"],
+"correctAnswer": "A. 例子"
+},
+{
+"question": "exhibit",
+"options": ["A. 展示", "B. 隱藏", "C. 收藏", "D. 丟棄"],
+"correctAnswer": "A. 展示"
+},
+{
+"question": "explain",
+"options": ["A. 解釋", "B. 混淆", "C. 誤導", "D. 隱瞞"],
+"correctAnswer": "A. 解釋"
+},
+{
+"question": "explore",
+"options": ["A. 探索", "B. 放棄", "C. 逃避", "D. 忽視"],
+"correctAnswer": "A. 探索"
+},
+{
+"question": "express",
+"options": ["A. 表達", "B. 壓制", "C. 隱藏", "D. 否認"],
+"correctAnswer": "A. 表達"
+},
+{
+"question": "extend",
+"options": ["A. 延伸", "B. 收縮", "C. 縮短", "D. 減少"],
+"correctAnswer": "A. 延伸"
+},
+{
+"question": "facilitate",
+"options": ["A. 促進", "B. 阻礙", "C. 困難", "D. 延遲"],
+"correctAnswer": "A. 促進"
+},
+{
+"question": "focus",
+"options": ["A. 專注", "B. 分散", "C. 放鬆", "D. 懶散"],
+"correctAnswer": "A. 專注"
+},
+{
+"question": "follow",
+"options": ["A. 跟隨", "B. 領導", "C. 指揮", "D. 引導"],
+"correctAnswer": "A. 跟隨"
+},
+{
+"question": "form",
+"options": ["A. 形成", "B. 分解", "C. 毀滅", "D. 消失"],
+"correctAnswer": "A. 形成"
+},
+{
+"question": "formulate",
+"options": ["A. 制訂", "B. 放棄", "C. 破壞", "D. 忽視"],
+"correctAnswer": "A. 制訂"
+},
+{
+"question": "function",
+"options": ["A. 功能", "B. 故障", "C. 損壞", "D. 廢棄"],
+"correctAnswer": "A. 功能"
+},
+{
+"question": "gather",
+"options": ["A. 聚集", "B. 分散", "C. 丟棄", "D. 浪費"],
+"correctAnswer": "A. 聚集"
+},
+{
+"question": "generate",
+"options": ["A. 產生", "B. 消滅", "C. 破壞", "D. 廢棄"],
+"correctAnswer": "A. 產生"
+},
+{
+"question": "goal",
+"options": ["A. 目標", "B. 起點", "C. 過程", "D. 結束"],
+"correctAnswer": "A. 目標"
+},
+{
+"question": "guide",
+"options": ["A. 引導", "B. 跟隨", "C. 服從", "D. 聽命"],
+"correctAnswer": "A. 引導"
+},
+{
+"question": "handle",
+"options": ["A. 處理", "B. 逃避", "C. 忽視", "D. 放棄"],
+"correctAnswer": "A. 處理"
+},
+{
+"question": "identify",
+"options": ["A. 識別", "B. 混淆", "C. 誤認", "D. 忽視"],
+"correctAnswer": "A. 識別"
+},
+{
+"question": "illustrate",
+"options": ["A. 說明", "B. 模糊", "C. 隱瞞", "D. 誤導"],
+"correctAnswer": "A. 說明"
+},
+{
+"question": "impact",
+"options": ["A. 影響", "B. 無關", "C. 疏遠", "D. 隔離"],
+"correctAnswer": "A. 影響"
+},
+{
+"question": "implement",
+"options": ["A. 執行", "B. 放棄", "C. 阻止", "D. 中斷"],
+"correctAnswer": "A. 執行"
+},
+{
+"question": "improve",
+"options": ["A. 改進", "B. 惡化", "C. 降低", "D. 損害"],
+"correctAnswer": "A. 改進"
+},
+{
+"question": "include",
+"options": ["A. 包括", "B. 排除", "C. 丟棄", "D. 忽視"],
+"correctAnswer": "A. 包括"
+},
+{
+"question": "increase",
+"options": ["A. 增加", "B. 減少", "C. 降低", "D. 縮小"],
+"correctAnswer": "A. 增加"
+},
+{
+"question": "indicate",
+"options": ["A. 表明", "B. 隱瞞", "C. 否認", "D. 猜測"],
+"correctAnswer": "A. 表明"
+},
+{
+"question": "influence",
+"options": ["A. 影響", "B. 無關", "C. 疏遠", "D. 隔離"],
+"correctAnswer": "A. 影響"
+},
+{
+"question": "inhibit",
+"options": ["A. 抑制", "B. 促進", "C. 鼓勵", "D. 支持"],
+"correctAnswer": "A. 抑制"
+},
+{
+"question": "initiate",
+"options": ["A. 發起", "B. 結束", "C. 中斷", "D. 放棄"],
+"correctAnswer": "A. 發起"
+},
+{
+"question": "inquire",
+"options": ["A. 查詢", "B. 沉默", "C. 隱瞞", "D. 拒絕"],
+"correctAnswer": "A. 查詢"
+},
+{
+"question": "inspect",
+"options": ["A. 檢查", "B. 忽視", "C. 放棄", "D. 逃避"],
+"correctAnswer": "A. 檢查"
+},
+{
+"question": "institute",
+"options": ["A. 學院", "B. 工廠", "C. 商店", "D. 農場"],
+"correctAnswer": "A. 學院"
+},
+{
+"question": "instruct",
+"options": ["A. 指導", "B. 服從", "C. 聽命", "D. 跟隨"],
+"correctAnswer": "A. 指導"
+},
+{
+"question": "integrate",
+"options": ["A. 整合", "B. 分離", "C. 分裂", "D. 隔離"],
+"correctAnswer": "A. 整合"
+},
+{
+"question": "interact",
+"options": ["A. 互動", "B. 隔絕", "C. 孤立", "D. 疏遠"],
+"correctAnswer": "A. 互動"
+},
+{
+"question": "interpret",
+"options": ["A. 解釋", "B. 混淆", "C. 誤導", "D. 隱瞞"],
+"correctAnswer": "A. 解釋"
+},
+{
+"question": "intervene",
+"options": ["A. 干預", "B. 旁觀", "C. 忽視", "D. 逃避"],
+"correctAnswer": "A. 干預"
+},
+{
+"question": "invest",
+"options": ["A. 投資", "B. 浪費", "C. 揮霍", "D. 丟棄"],
+"correctAnswer": "A. 投資"
+},
+{
+"question": "investigate",
+"options": ["A. 調查", "B. 忽視", "C. 放棄", "D. 逃避"],
+"correctAnswer": "A. 調查"
+},
+{
+"question": "junior",
+"options": ["A. 高級的", "B. 初級的，年少的", "C. 中級的", "D. 資深的"],
+"correctAnswer": "B. 初級的，年少的"
+},
+{
+"question": "justify",
+"options": ["A. 指責", "B. 證明...正當", "C. 批評", "D. 反對"],
+"correctAnswer": "B. 證明...正當"
+},
+{
+"question": "keen",
+"options": ["A. 遲鈍的", "B. 敏銳的，熱心的", "C. 冷漠的", "D. 麻木的"],
+"correctAnswer": "B. 敏銳的，熱心的"
+},
+{
+"question": "knowledge",
+"options": ["A. 無知", "B. 知識，學識", "C. 愚蠢", "D. 淺薄"],
+"correctAnswer": "B. 知識，學識"
+},
+{
+"question": "lack",
+"options": ["A. 擁有", "B. 缺乏，缺少", "C. 豐富", "D. 充足"],
+"correctAnswer": "B. 缺乏，缺少"
+},
+{
+"question": "launch",
+"options": ["A. 結束", "B. 發射，推出", "C. 放棄", "D. 中斷"],
+"correctAnswer": "B. 發射，推出"
+},
+{
+"question": "legal",
+"options": ["A. 非法的", "B. 合法的，法律的", "C. 違法的", "D. 無效的"],
+"correctAnswer": "B. 合法的，法律的"
+},
+{
+"question": "limit",
+"options": ["A. 無限", "B. 限制，界限", "C. 擴張", "D. 延伸"],
+"correctAnswer": "B. 限制，界限"
+},
+{
+"question": "link",
+"options": ["A. 分離", "B. 連接，聯繫", "C. 分裂", "D. 隔離"],
+"correctAnswer": "B. 連接，聯繫"
+},
+{
+"question": "local",
+"options": ["A. 全球的", "B. 當地的，本地的", "C. 國外的", "D. 遠方的"],
+"correctAnswer": "B. 當地的，本地的"
+},
+{
+"question": "locate",
+"options": ["A. 隱藏", "B. 定位，位於", "C. 丟失", "D. 逃避"],
+"correctAnswer": "B. 定位，位於"
+},
+{
+"question": "logical",
+"options": ["A. 不合邏輯的", "B. 合乎邏輯的", "C. 混亂的", "D. 模糊的"],
+"correctAnswer": "B. 合乎邏輯的"
+},
+
+
+{
+"question": "maintain",
+"options": ["A. 放棄", "B. 維持，保持", "C. 損壞", "D. 廢棄"],
+"correctAnswer": "B. 維持，保持"
+},
+{
+"question": "major",
+"options": ["A. 次要的", "B. 主要的，主修科目", "C. 微小的", "D. 不重要的"],
+"correctAnswer": "B. 主要的，主修科目"
+},
+{
+"question": "manage",
+"options": ["A. 失控", "B. 管理，經營", "C. 混亂", "D. 無序"],
+"correctAnswer": "B. 管理，經營"
+},
+{
+"question": "manifest",
+"options": ["A. 隱藏", "B. 顯示，表明", "C. 否認", "D. 瞞騙"],
+"correctAnswer": "B. 顯示，表明"
+},
+{
+"question": "manual",
+"options": ["A. 自動的", "B. 手動的，手冊", "C. 電子的", "D. 智能的"],
+"correctAnswer": "B. 手動的，手冊"
+},
+{
+"question": "manufacture",
+"options": ["A. 銷售", "B. 製造，生產", "C. 購買", "D. 消費"],
+"correctAnswer": "B. 製造，生產"
+},
+{
+"question": "marginal",
+"options": ["A. 主要的", "B. 邊緣的，微小的", "C. 核心的", "D. 重要的"],
+"correctAnswer": "B. 邊緣的，微小的"
+},
+{
+"question": "mature",
+"options": ["A. 幼稚的", "B. 成熟的", "C. 頑皮的", "D. 天真的"],
+"correctAnswer": "B. 成熟的"
+},
+{
+"question": "maximize",
+"options": ["A. 最小化", "B. 最大化", "C. 減少", "D. 降低"],
+"correctAnswer": "B. 最大化"
+},
+{
+"question": "measure",
+"options": ["A. 估計", "B. 測量，措施", "C. 猜測", "D. 想象"],
+"correctAnswer": "B. 測量，措施"
+},
+{
+"question": "mediate",
+"options": ["A. 加劇", "B. 調解，調停", "C. 製造", "D. 擴大"],
+"correctAnswer": "B. 調解，調停"
+},
+{
+"question": "medical",
+"options": ["A. 教育的", "B. 醫學的，醫療的", "C. 法律的", "D. 工程的"],
+"correctAnswer": "B. 醫學的，醫療的"
+},
+{
+"question": "meet",
+"options": ["A. 錯過", "B. 遇見，滿足", "C. 逃避", "D. 忽視"],
+"correctAnswer": "B. 遇見，滿足"
+},
+{
+"question": "melt",
+"options": ["A. 凝固", "B. 融化，熔化", "C. 冷凍", "D. 結冰"],
+"correctAnswer": "B. 融化，熔化"
+},
+{
+"question": "minimize",
+"options": ["A. 最大化", "B. 最小化", "C. 增加", "D. 擴大"],
+"correctAnswer": "B. 最小化"
+},
+{
+"question": "minor",
+"options": ["A. 主要的", "B. 次要的，輕微的", "C. 核心的", "D. 重要的"],
+"correctAnswer": "B. 次要的，輕微的"
+},
+{
+"question": "modify",
+"options": ["A. 保持", "B. 修改，改動", "C. 保留", "D. 原封不動"],
+"correctAnswer": "B. 修改，改動"
+},
+{
+"question": "monitor",
+"options": ["A. 忽視", "B. 監控，監視", "C. 放棄", "D. 逃避"],
+"correctAnswer": "B. 監控，監視"
+},
+{
+"question": "moral",
+"options": ["A. 不道德的", "B. 道德的，道德規範", "C. 邪惡的", "D. 墮落的"],
+"correctAnswer": "B. 道德的，道德規範"
+},
+{
+"question": "motivate",
+"options": ["A. 打擊", "B. 激勵，驅使", "C. 挫敗", "D. 抑制"],
+"correctAnswer": "B. 激勵，驅使"
+},
+{
+"question": "multiple",
+"options": ["A. 單一的", "B. 多個的，多樣的", "C. 唯一的", "D. 單獨的"],
+"correctAnswer": "B. 多個的，多樣的"
+},
+{
+"question": "mutual",
+"options": ["A. 單方面的", "B. 相互的，彼此的", "C. 獨自的", "D. 單一的"],
+"correctAnswer": "B. 相互的，彼此的"
+},
+{
+"question": "narrow",
+"options": ["A. 寬闊的", "B. 狹窄的", "C. 遼闊的", "D. 寬敞的"],
+"correctAnswer": "B. 狹窄的"
+},
+{
+"question": "neglect",
+"options": ["A. 重視", "B. 忽視，忽視", "C. 關注", "D. 留意"],
+"correctAnswer": "B. 忽視，忽視"
+},
+{
+"question": "negotiate",
+"options": ["A. 爭吵", "B. 談判，協商", "C. 爭辯", "D. 對抗"],
+"correctAnswer": "B. 談判，協商"
+},
+{
+"question": "network",
+"options": ["A. 孤立", "B. 網絡，聯網", "C. 隔絕", "D. 分離"],
+"correctAnswer": "B. 網絡，聯網"
+},
+{
+"question": "neutral",
+"options": ["A. 偏袒的", "B. 中立的", "C. 偏執的", "D. 固執的"],
+"correctAnswer": "B. 中立的"
+},
+{
+"question": "nevertheless",
+"options": ["A. 因此", "B. 然而，儘管如此", "C. 所以", "D. 因而"],
+"correctAnswer": "B. 然而，儘管如此"
+},
+{
+"question": "normal",
+"options": ["A. 異常的", "B. 正常的，標準的", "C. 特殊的", "D. 奇異的"],
+"correctAnswer": "B. 正常的，標準的"
+},
+{
+"question": "notable",
+"options": ["A. 普通的", "B. 顯著的，值得注意的", "C. 平凡的", "D. 平庸的"],
+"correctAnswer": "B. 顯著的，值得注意的"
+},
+{
+"question": "notion",
+"options": ["A. 事實", "B. 概念，觀念", "C. 現實", "D. 真相"],
+"correctAnswer": "B. 概念，觀念"
+},
+{
+"question": "observe",
+"options": ["A. 忽視", "B. 觀察，遵守", "C. 逃避", "D. 違反"],
+"correctAnswer": "B. 觀察，遵守"
+},
+{
+"question": "obtain",
+"options": ["A. 丟失", "B. 獲得，得到", "C. 放棄", "D. 放棄"],
+"correctAnswer": "B. 獲得，得到"
+},
+{
+"question": "obvious",
+"options": ["A. 隱藏的", "B. 明顯的，顯而易見的", "C. 模糊的", "D. 隱晦的"],
+"correctAnswer": "B. 明顯的，顯而易見的"
+},
+{
+"question": "occur",
+"options": ["A. 消失", "B. 發生，出現", "C. 滅絕", "D. 不見"],
+"correctAnswer": "B. 發生，出現"
+},
+{
+"question": "obtain",
+"options": ["A. 放棄", "B. 獲得，得到", "C. 丟失", "D. 浪費"],
+"correctAnswer": "B. 獲得，得到"
+},
+{
+"question": "occupy",
+"options": ["A. 空閒", "B. 佔據，佔用", "C. 閒置", "D. 荒廢"],
+"correctAnswer": "B. 佔據，佔用"
+},
+{
+"question": "offend",
+"options": ["A. 討好", "B. 冒犯，觸犯", "C. 取悅", "D. 巴結"],
+"correctAnswer": "B. 冒犯，觸犯"
+},
+{
+"question": "offer",
+"options": ["A. 拒絕", "B. 提供，提議", "C. 否決", "D. 反對"],
+"correctAnswer": "B. 提供，提議"
+},
+{
+"question": "operate",
+"options": ["A. 停止", "B. 操作，運營", "C. 中斷", "D. 放棄"],
+"correctAnswer": "B. 操作，運營"
+},
+{
+"question": "optimal",
+"options": ["A. 最差的", "B. 最佳的，最優的", "C. 普通的", "D. 平庸的"],
+"correctAnswer": "B. 最佳的，最優的"
+},
+{
+"question": "organize",
+"options": ["A. 混亂", "B. 組織，整理", "C. 雜亂", "D. 無序"],
+"correctAnswer": "B. 組織，整理"
+},
+{
+"question": "original",
+"options": ["A. 模仿的", "B. 原創的，最初的", "C. 抄襲的", "D. 複製的"],
+"correctAnswer": "B. 原創的，最初的"
+},
+{
+"question": "outline",
+"options": ["A. 詳述", "B. 大綱，概述", "C. 詳解", "D. 細述"],
+"correctAnswer": "B. 大綱，概述"
+},
+{
+"question": "output",
+"options": ["A. 輸入", "B. 輸出，產量", "C. 輸送", "D. 傳送"],
+"correctAnswer": "B. 輸出，產量"
+},
+{
+"question": "overall",
+"options": ["A. 局部的", "B. 總體的，全面的", "C. 部分的", "D. 個別的"],
+"correctAnswer": "B. 總體的，全面的"
+},
+{
+"question": "overcome",
+"options": ["A. 屈服", "B. 克服，戰勝", "C. 妥協", "D. 退讓"],
+"correctAnswer": "B. 克服，戰勝"
+},
+{
+"question": "owe",
+"options": ["A. 償還", "B. 欠，歸功於", "C. 給予", "D. 贈送"],
+"correctAnswer": "B. 欠，歸功於"
+},
+{
+"question": "own",
+"options": ["A. 他人的", "B. 自己的，擁有", "C. 別人的", "D. 公共的"],
+"correctAnswer": "B. 自己的，擁有"
+},
+{
+"question": "participate",
+"options": ["A. 旁觀", "B. 參與，參加", "C. 逃避", "D. 放棄"],
+"correctAnswer": "B. 參與，參加"
+},
+{
+"question": "particular",
+"options": ["A. 普遍的", "B. 特定的，特別的", "C. 一般的", "D. 普通的"],
+"correctAnswer": "B. 特定的，特別的"
+},
+{
+"question": "passive",
+"options": ["A. 主動的", "B. 被動的，消極的", "C. 積極的", "D. 主動的"],
+"correctAnswer": "B. 被動的，消極的"
+},
+{
+"question": "perceive",
+"options": ["A. 忽視", "B. 感知，認識到", "C. 否認", "D. 漠視"],
+"correctAnswer": "B. 感知，認識到"
+},
+{
+"question": "perform",
+"options": ["A. 放棄", "B. 執行，表演", "C. 逃避", "D. 中斷"],
+"correctAnswer": "B. 執行，表演"
+},
+{
+"question": "permanent",
+"options": ["A. 臨時的", "B. 永久的，長久的", "C. 短暫的", "D. 暫時的"],
+"correctAnswer": "B. 永久的，長久的"
+},
+{
+"question": "permit",
+"options": ["A. 禁止", "B. 許可，准許", "C. 阻止", "D. 反對"],
+"correctAnswer": "B. 許可，准許"
+},
+{
+"question": "persist",
+"options": ["A. 放棄", "B. 堅持，固執", "C. 妥協", "D. 退讓"],
+"correctAnswer": "B. 堅持，固執"
+},
+{
+"question": "persuade",
+"options": ["A. 反對", "B. 說服，勸服", "C. 質疑", "D. 否認"],
+"correctAnswer": "B. 說服，勸服"
+},
+{
+"question": "phase",
+"options": ["A. 整體", "B. 階段，時期", "C. 全部", "D. 整體"],
+"correctAnswer": "B. 階段，時期"
+},
+{
+"question": "physical",
+"options": ["A. 精神的", "B. 身體的，物理的", "C. 心理的", "D. 思想的"],
+"correctAnswer": "B. 身體的，物理的"
+},
+{
+"question": "pioneer",
+"options": ["A. 跟隨者", "B. 先驅，開拓者", "C. 模仿者", "D. 追隨者"],
+"correctAnswer": "B. 先驅，開拓者"
+},
+{
+"question": "planet",
+"options": ["A. 恒星", "B. 行星", "C. 衛星", "D. 彗星"],
+"correctAnswer": "B. 行星"
+},
+{
+"question": "pledge",
+"options": ["A. 背棄", "B. 承諾，保證", "C. 否認", "D. 逃避"],
+"correctAnswer": "B. 承諾，保證"
+},
+{
+"question": "policy",
+"options": ["A. 隨意", "B. 政策，方針", "C. 混亂", "D. 無序"],
+"correctAnswer": "B. 政策，方針"
+},
+{
+"question": "pollute",
+"options": ["A. 淨化", "B. 污染，弄髒", "C. 清潔", "D. 淨化"],
+"correctAnswer": "B. 污染，弄髒"
+},
+{
+"question": "potential",
+"options": ["A. 實際的", "B. 潛在的，可能的", "C. 現實的", "D. 確定的"],
+"correctAnswer": "B. 潛在的，可能的"
+},
+{
+"question": "predict",
+"options": ["A. 後悔", "B. 預測，預言", "C. 後知後覺", "D. 追悔"],
+"correctAnswer": "B. 預測，預言"
+},
+{
+"question": "prefer",
+"options": ["A. 討厭", "B. 更喜歡，寧願", "C. 排斥", "D. 拒絕"],
+"correctAnswer": "B. 更喜歡，寧願"
+},
+{
+"question": "prepare",
+"options": ["A. unprepare", "B. 準備，預備", "C. 放棄", "D. 逃避"],
+"correctAnswer": "B. 準備，預備"
+},
+{
+"question": "preserve",
+"options": ["A. 破壞", "B. 保護，保存", "C. 損害", "D. 毀滅"],
+"correctAnswer": "B. 保護，保存"
+},
+{
+"question": "prevent",
+"options": ["A. 促進", "B. 預防，阻止", "C. 鼓勵", "D. 支持"],
+"correctAnswer": "B. 預防，阻止"
+},
+{
+"question": "previous",
+"options": ["A. 後面的", "B. 以前的，先前的", "C. 後續的", "D. 後來的"],
+"correctAnswer": "B. 以前的，先前的"
+},
+{
+"question": "primary",
+"options": ["A. 次要的", "B. 主要的，初級的", "C. 中級的", "D. 高級的"],
+"correctAnswer": "B. 主要的，初級的"
+},
+{
+"question": "prior",
+"options": ["A. 其後的", "B. 優先的，先前的", "C. 後來的", "D. 之後的"],
+"correctAnswer": "B. 優先的，先前的"
+},
+{
+"question": "private",
+"options": ["A. 公共的", "B. 私人的，私密的", "C. 公開的", "D. 大眾的"],
+"correctAnswer": "B. 私人的，私密的"
+},
+{
+"question": "probable",
+"options": ["A. 不可能的", "B. 很可能的，大概的", "C. 確定的", "D. 肯定的"],
+"correctAnswer": "B. 很可能的，大概的"
+},
+{
+"question": "problem",
+"options": ["A. 解決方案", "B. 問題，難題", "C. 答案", "D. 結果"],
+"correctAnswer": "B. 問題，難題"
+},
+{
+"question": "process",
+"options": ["A. 結果", "B. 過程，處理", "C. 結局", "D. 成果"],
+"correctAnswer": "B. 過程，處理"
+},
+{
+"question": "produce",
+"options": ["A. 消費", "B. 生產，產生", "C. 浪費", "D. 儲存"],
+"correctAnswer": "B. 生產，產生"
+},
+{
+"question": "professional",
+"options": ["A. 業餘的", "B. 專業的，專業人士", "C. 業餘愛好者", "D. 新手"],
+"correctAnswer": "B. 專業的，專業人士"
+},
+{
+"question": "prohibit",
+"options": ["A. 允許", "B. 禁止，阻止", "C. 同意", "D. 批准"],
+"correctAnswer": "B. 禁止，阻止"
+},
+{
+"question": "project",
+"options": ["A. 拆毀", "B. 項目，計劃", "C. 破壞", "D. 廢棄"],
+"correctAnswer": "B. 項目，計劃"
+},
+{
+"question": "promote",
+"options": ["A. 貶低", "B. 促進，提升", "C. 降低", "D. 削弱"],
+"correctAnswer": "B. 促進，提升"
+},
+{
+"question": "prompt",
+"options": ["A. 延遲", "B. 迅速的，提示", "C. 緩慢的", "D. 拖延"],
+"correctAnswer": "B. 迅速的，提示"
+},
+{
+"question": "protect",
+"options": ["A. 傷害", "B. 保護，防護", "C. 摧毀", "D. 損壞"],
+"correctAnswer": "B. 保護，防護"
+},
+{
+"question": "prove",
+"options": ["A. 質疑", "B. 證明，證實", "C. 否認", "D. 猜測"],
+"correctAnswer": "B. 證明，證實"
+},
+{
+"question": "provide",
+"options": ["A. 索取", "B. 提供，供給", "C. 拒絕", "D. 剝奪"],
+"correctAnswer": "B. 提供，供給"
+},
+{
+"question": "public",
+"options": ["A. 私人的", "B. 公共的，公眾的", "C. 私密的", "D. 個人的"],
+"correctAnswer": "B. 公共的，公眾的"
+},
+{
+"question": "publish",
+"options": ["A. 隱藏", "B. 出版，發表", "C. 收藏", "D. 保密"],
+"correctAnswer": "B. 出版，發表"
+},
+{
+"question": "purchase",
+"options": ["A. 銷售", "B. 購買，購置", "C. 贈送", "D. 捐贈"],
+"correctAnswer": "B. 購買，購置"
+},
+{
+"question": "pursue",
+"options": ["A. 放棄", "B. 追求，從事", "C. 逃避", "D. 退卻"],
+"correctAnswer": "B. 追求，從事"
+},
+{
+"question": "qualify",
+"options": ["A. 失去資格", "B. 使合格，取得資格", "C. 不合格", "D. 放棄資格"],
+"correctAnswer": "B. 使合格，取得資格"
+},
+{
+"question": "quality",
+"options": ["A. 數量", "B. 質量，品質", "C. 總數", "D. 數額"],
+"correctAnswer": "B. 質量，品質"
+},
+{
+"question": "quantity",
+"options": ["A. 質量", "B. 數量，數額", "C. 品質", "D. 等級"],
+"correctAnswer": "B. 數量，數額"
+},
+{
+"question": "quit",
+"options": ["A. 堅持", "B. 放棄，退出", "C. 繼續", "D. 堅持"],
+"correctAnswer": "B. 放棄，退出"
+},
+{
+"question": "raise",
+"options": ["A. 降低", "B. 提高，籌集", "C. 減少", "D. 縮小"],
+"correctAnswer": "B. 提高，籌集"
+},
+{
+"question": "range",
+"options": ["A. 單一", "B. 範圍，系列", "C. 唯一", "D. 單獨"],
+"correctAnswer": "B. 範圍，系列"
+},
+{
+"question": "react",
+"options": ["A. 無動於衷", "B. 反應，回應", "C. 漠視", "D. 忽視"],
+"correctAnswer": "B. 反應，回應"
+},
+{
+"question": "realize",
+"options": ["A. 忽視", "B. 實現，認識到", "C. 否認", "D. 忘記"],
+"correctAnswer": "B. 實現，認識到"
+},
+{
+"question": "reasonable",
+"options": ["A. 不合理的", "B. 合理的，通情達理的", "C. 固執的", "D. 偏執的"],
+"correctAnswer": "B. 合理的，通情達理的"
+},
+{
+"question": "rebel",
+"options": ["A. 服從", "B. 反叛，反抗", "C. 聽命", "D. 順從"],
+"correctAnswer": "B. 反叛，反抗"
+},
+{
+"question": "recall",
+"options": ["A. 忘記", "B. 回憶，召回", "C. 遺忘", "D. 忽視"],
+"correctAnswer": "B. 回憶，召回"
+},
+{
+"question": "receive",
+"options": ["A. 發送", "B. 接收，收到", "C. 傳送", "D. 發出"],
+"correctAnswer": "B. 接收，收到"
+},
+{
+"question": "recognize",
+"options": ["A. 誤認", "B. 識別，承認", "C. 混淆", "D. 忽視"],
+"correctAnswer": "B. 識別，承認"
+},
+{
+"question": "recommend",
+"options": ["A. 反對", "B. 推薦，建議", "C. 否決", "D. 駁斥"],
+"correctAnswer": "B. 推薦，建議"
+},
+{
+"question": "record",
+"options": ["A. 刪除", "B. 記錄，記錄", "C. 銷毀", "D. 丟棄"],
+"correctAnswer": "B. 記錄，記錄"
+},
+{
+"question": "recover",
+"options": ["A. 受損", "B. 康復，恢復", "C. 惡化", "D. 損壞"],
+"correctAnswer": "B. 康復，恢復"
+},
+{
+"question": "reduce",
+"options": ["A. 增加", "B. 減少，降低", "C. 擴大", "D. 提升"],
+"correctAnswer": "B. 減少，降低"
+},
+{
+"question": "refer",
+"options": ["A. 忽略", "B. 提及，參考", "C. 忘記", "D. 忽視"],
+"correctAnswer": "B. 提及，參考"
+},
+{
+"question": "reflect",
+"options": ["A. 吸收", "B. 反射，反映", "C. 傳導", "D. 透過"],
+"correctAnswer": "B. 反射，反映"
+},
+{
+"question": "queer",
+"options": ["A. 可愛的", "B. 野蠻的", "C. 奇怪的", "D. 傳統的"],
+"correctAnswer": "C. 奇怪的"
+},
+{
+"question": "tame",
+"options": ["A. 野蠻的", "B. 兇猛的", "C. 活潑的", "D. 馴服的"],
+"correctAnswer": "D. 馴服的"
+},
+{
+"question": "chameleon",
+"options": ["A. 蜥蜴", "B. 壁虎", "C. 變色龍", "D. 青蛙"],
+"correctAnswer": "C. 變色龍"
+},
+{
+"question": "hue",
+"options": ["A. 形狀", "B. 大小", "C. 質地", "D. 色調"],
+"correctAnswer": "D. 色調"
+},
+{
+"question": "zigzag",
+"options": ["A. 圓形的", "B. 直線的", "C. 鋸齒形的", "D. 波浪形的"],
+"correctAnswer": "C. 鋸齒形的"
+},
+{
+"question": "linger",
+"options": ["A. 奔跑", "B. 飛翔", "C. 跳躍", "D. 徘徊"],
+"correctAnswer": "D. 徘徊"
+},
+{
+"question": "fiendish",
+"options": ["A. 善良的", "B. 溫和的", "C. 邪惡的", "D. 可愛的"],
+"correctAnswer": "C. 邪惡的"
+},
+{
+"question": "crafty",
+"options": ["A. 誠實的", "B. 直率的", "C. 粗魯的", "D. 狡猾的"],
+"correctAnswer": "D. 狡猾的"
+},
+{
+"question": "nasty",
+"options": ["A. 友好的", "B. 親切的", "C. 討厭的", "D. 開朗的"],
+"correctAnswer": "C. 討厭的"
+},
+{
+"question": "wondrous",
+"options": ["A. 普通的", "B. 平庸的", "C. 無聊的", "D. 奇妙的"],
+"correctAnswer": "D. 奇妙的"
+},
+{
+"question": "drastic",
+"options": ["A. 輕微的", "B. 溫和的", "C. 嚴重的", "D. 輕鬆的"],
+"correctAnswer": "C. 嚴重的"
+},
+{
+"question": "unsuspicious",
+"options": ["A. 懷疑的", "B. 警惕的", "C. 擔心的", "D. 不懷疑的"],
+"correctAnswer": "D. 不懷疑的"
+},
+{
+"question": "vicious",
+"options": ["A. 溫柔的", "B. 善良的", "C. 兇狠的", "D. 體貼的"],
+"correctAnswer": "C. 兇狠的"
+},
+{
+"question": "sharp-fanged",
+"options": ["A. 無牙的", "B. 鈍牙的", "C. 軟牙的", "D. 尖牙的"],
+"correctAnswer": "D. 尖牙的"
+},
+{
+"question": "cologne",
+"options": ["A. 香水", "B. 香皂", "C. 古龍水", "D. 護膚品"],
+"correctAnswer": "C. 古龍水"
+},
+{
+"question": "Vikings",
+"options": ["A. 羅馬人", "B. 希臘人", "C. 維京人", "D. 埃及人"],
+"correctAnswer": "C. 維京人"
+},
+{
+"question": "submerged",
+"options": ["A. 露出的", "B. 乾燥的", "C. 懸掛的", "D. 淹沒的"],
+"correctAnswer": "D. 淹沒的"
+},
+{
+"question": "Bering Strait",
+"options": ["A. 馬六甲海峽", "B. 直布羅陀海峽", "C. 白令海峽", "D. 英吉利海峽"],
+"correctAnswer": "C. 白令海峽"
+},
+{
+"question": "turquoise",
+"options": ["A. 紅寶石", "B. 藍寶石", "C. 翡翠", "D. 綠松石"],
+"correctAnswer": "D. 綠松石"
+},
+{
+"question": "moccasins",
+"options": ["A. 皮鞋", "B. 布鞋", "C. 莫卡辛鞋", "D. 運動鞋"],
+"correctAnswer": "C. 莫卡辛鞋"
+},
+{
+"question": "toboggans",
+"options": ["A. 滑雪板", "B. 雪杖", "C. 雪衣", "D. 平底雪橇"],
+"correctAnswer": "D. 平底雪橇"
+},
+{
+"question": "canoe",
+"options": ["A. 小船", "B. 遊艇", "C. 獨木舟", "D. 帆船"],
+"correctAnswer": "C. 獨木舟"
+},
+{
+"question": "avocados",
+"options": ["A. 芒果", "B. 菠蘿", "C. 奇異果", "D. 牛油果"],
+"correctAnswer": "D. 牛油果"
+},
+{
+"question": "maize",
+"options": ["A. 小麥", "B. 大米", "C. 玉米", "D. 高粱"],
+"correctAnswer": "C. 玉米"
+},
+{
+"question": "squashes",
+"options": ["A. 西紅柿", "B. 黃瓜", "C. 茄子", "D. 南瓜屬植物"],
+"correctAnswer": "D. 南瓜屬植物"
+},
+{
+"question": "liquor",
+"options": ["A. 果汁", "B. 牛奶", "C. 烈酒", "D. 茶葉"],
+"correctAnswer": "C. 烈酒"
+},
+{
+"question": "measles",
+"options": ["A. 感冒", "B. 咳嗽", "C. 發燒", "D. 麻疹"],
+"correctAnswer": "D. 麻疹"
+},
+{
+"question": "smallpox",
+"options": ["A. 水痘", "B. 天花", "C. 麻疹", "D. 風疹"],
+"correctAnswer": "B. 天花"
+},
+{
+"question": "trappers",
+"options": ["A. 農夫", "B. 漁夫", "C. 獵人", "D. 捕獸者"],
+"correctAnswer": "D. 捕獸者"
+},
+{
+"question": "settlers",
+"options": ["A. 旅行者", "B. 探險家", "C. 定居者", "D. 商人"],
+"correctAnswer": "C. 定居者"
+},
+{
+"question": "inauspicious",
+"options": ["A. 吉祥的", "B. 幸運的", "C. 不祥的", "D. 順利的"],
+"correctAnswer": "C. 不祥的"
+},
+{
+"question": "twiddling",
+"options": ["A. 握住", "B. 放下", "C. 擺動", "D. 捻弄"],
+"correctAnswer": "D. 捻弄"
+},
+{
+"question": "banquet",
+"options": ["A. 便餐", "B. 快餐", "C. 盛宴", "D. 便當"],
+"correctAnswer": "C. 盛宴"
+},
+{
+"question": "paramount",
+"options": ["A. 次要的", "B. 普通的", "C. 重要的", "D. 至高無上的"],
+"correctAnswer": "D. 至高無上的"
+},
+{
+"question": "slurps",
+"options": ["A. 小聲吃", "B. 慢慢吃", "C. 咀嚼", "D. 啜食聲"],
+"correctAnswer": "D. 啜食聲"
+},
+{
+"question": "disrespectful",
+"options": ["A. 尊重的", "B. 禮貌的", "C. 無禮的", "D. 謙虛的"],
+"correctAnswer": "C. 無禮的"
+},
+{
+"question": "insufficient",
+"options": ["A. 充足的", "B. 足夠的", "C. 短缺的", "D. 豐富的"],
+"correctAnswer": "C. 短缺的"
+},
+{
+"question": "gesturing",
+"options": ["A. 說話", "B. 聽講", "C. 書寫", "D. 做手勢"],
+"correctAnswer": "D. 做手勢"
+},
+{
+"question": "conventionally",
+"options": ["A. 創新地", "B. 隨意地", "C. 傳統地", "D. 臨時地"],
+"correctAnswer": "C. 傳統地"
+},
+{
+"question": "inhabitants",
+"options": ["A. 訪問者", "B. 旅行者", "C. 居民", "D. 探險家"],
+"correctAnswer": "C. 居民"
+},
+{
+"question": "moai",
+"options": ["A. 石碑", "B. 廟宇", "C. 摩艾石像", "D. 金字塔"],
+"correctAnswer": "C. 摩艾石像"
+},
+{
+"question": "ahu",
+"options": ["A. 廣場", "B. 街道", "C. 祭壇平台", "D. 住宅"],
+"correctAnswer": "C. 祭壇平台"
+},
+{
+"question": "toppled",
+"options": ["A. 豎立", "B. 修復", "C. 推倒", "D. 裝飾"],
+"correctAnswer": "C. 推倒"
+},
+{
+"question": "kidnapped",
+"options": ["A. 邀請", "B. 幫助", "C. 綁架", "D. 接待"],
+"correctAnswer": "C. 綁架"
+},
+{
+"question": "plantations",
+"options": ["A. 工廠", "B. 商店", "C. 農莊", "D. 學校"],
+"correctAnswer": "C. 農莊"
+},
+{
+"question": "germs",
+"options": ["A. 細菌", "B. 病毒", "C. 孢子", "D. 病菌"],
+"correctAnswer": "D. 病菌"
+},
+{
+"question": "extinct",
+"options": ["A. 活躍的", "B. 存在的", "C. 滅絕的", "D. 瀕危的"],
+"correctAnswer": "C. 滅絕的"
+},
+{
+"question": "crater",
+"options": ["A. 山谷", "B. 平原", "C. 火山口", "D. 河流"],
+"correctAnswer": "C. 火山口"
+},
+{
+"question": "statues",
+"options": ["A. 繪畫", "B. 雕塑", "C. 雕像", "D. 壁畫"],
+"correctAnswer": "C. 雕像"
+},
+{
+"question": "nestlings",
+"options": ["A. 鳥蛋", "B. 鳥巢", "C. 幼鳥", "D. 老鳥"],
+"correctAnswer": "C. 幼鳥"
+},
+{
+"question": "hawthorn",
+"options": ["A. 玫瑰", "B. 百合", "C. 山楂", "D. 牡丹"],
+"correctAnswer": "C. 山楂"
+},
+{
+"question": "hazel",
+"options": ["A. 楊樹", "B. 柳樹", "C. 榛樹", "D. 槐樹"],
+"correctAnswer": "C. 榛樹"
+},
+{
+"question": "banter",
+"options": ["A. 爭吵", "B. 打架", "C. 戲謔", "D. 爭辯"],
+"correctAnswer": "C. 戲謔"
+},
+{
+"question": "meadow",
+"options": ["A. 森林", "B. 山脈", "C. 草地", "D. 沙漠"],
+"correctAnswer": "C. 草地"
+},
+{
+"question": "chirp",
+"options": ["A. 尖叫", "B. 咆哮", "C. 鳴叫", "D. 哭泣"],
+"correctAnswer": "C. 鳴叫"
+},
+{
+"question": "homeward",
+"options": ["A. 離家的", "B. 遠行的", "C. 回家的", "D. 旅行的"],
+"correctAnswer": "C. 回家的"
+},
+{
+"question": "maidens",
+"options": ["A. 婦女", "B. 老人", "C. 少女", "D. 兒童"],
+"correctAnswer": "C. 少女"
+},
+{
+"question": "spree",
+"options": ["A. 工作", "B. 學習", "C. 狂歡", "D. 休息"],
+"correctAnswer": "C. 狂歡"
+},
+{
+"question": "distracted",
+"options": ["A. 專心的", "B. 認真的", "C. 分心的", "D. 仔細的"],
+"correctAnswer": "C. 分心的"
+},
+{
+"question": "panicked",
+"options": ["A. 冷靜的", "B. 鎮定的", "C. 恐慌的", "D. 從容的"],
+"correctAnswer": "C. 恐慌的"
+},
+{
+"question": "dismay",
+"options": ["A. 高興", "B. 喜悅", "C. 沮喪", "D. 興奮"],
+"correctAnswer": "C. 沮喪"
+},
+{
+"question": "darting",
+"options": ["A. 緩慢的", "B. 遲鈍的", "C. 快速移動的", "D. 穩定的"],
+"correctAnswer": "C. 快速移動的"
+},
+{
+"question": "sprinting",
+"options": ["A. 行走", "B. 慢跑", "C. 短跑", "D. 散步"],
+"correctAnswer": "C. 短跑"
+},
+{
+"question": "accelerated",
+"options": ["A. 減速", "B. 停止", "C. 加速", "D. 穩速"],
+"correctAnswer": "C. 加速"
+},
+{
+"question": "stumbled",
+"options": ["A. 奔跑", "B. 跳躍", "C. 絆倒", "D. 行走"],
+"correctAnswer": "C. 絆倒"
+},
+{
+"question": "profusely",
+"options": ["A. 少量地", "B. 輕微地", "C. 大量地", "D. 緩慢地"],
+"correctAnswer": "C. 大量地"
+},
+{
+"question": "hysterically",
+"options": ["A. 冷靜地", "B. 鎮定地", "C. 歇斯底里地", "D. 從容地"],
+"correctAnswer": "C. 歇斯底里地"
+},
+{
+"question": "asthma",
+"options": ["A. 肺炎", "B. 肺癌", "C. 哮喘", "D. 支氣管炎"],
+"correctAnswer": "C. 哮喘"
+},
+{
+"question": "wheezing",
+"options": ["A. 咳嗽", "B. 打噴嚏", "C. 喘息", "D. 發燒"],
+"correctAnswer": "C. 喘息"
+},
+{
+"question": "inhaling",
+"options": ["A. 呼氣", "B. 呼吸", "C. 吸氣", "D. 憋氣"],
+"correctAnswer": "C. 吸氣"
+},
+{
+"question": "exhaling",
+"options": ["A. 吸氣", "B. 呼吸", "C. 憋氣", "D. 呼氣"],
+"correctAnswer": "D. 呼氣"
+},
+{
+"question": "phlegm",
+"options": ["A. 鼻涕", "B. 眼淚", "C. 唾液", "D. 痰"],
+"correctAnswer": "D. 痰"
+},
+{
+"question": "bronchial",
+"options": ["A. 肺部的", "B. 心臟的", "C. 支氣管的", "D. 喉嚨的"],
+"correctAnswer": "C. 支氣管的"
+},
+{
+"question": "allergic",
+"options": ["A. 傳染的", "B. 感染的", "C. 過敏的", "D. 免疫的"],
+"correctAnswer": "C. 過敏的"
+},
+{
+"question": "pollens",
+"options": ["A. 細菌", "B. 病毒", "C. 花粉", "D. 塵埃"],
+"correctAnswer": "C. 花粉"
+},
+{
+"question": "hypersensitize",
+"options": ["A. 麻木", "B. 遲鈍", "C. 過敏", "D. 脫敏"],
+"correctAnswer": "D. 脫敏"
+},
+{
+"question": "steroid",
+"options": ["A. 抗生素", "B. 維生素", "C. 激素", "D. 類固醇"],
+"correctAnswer": "D. 類固醇"
+},
+{
+"question": "hospitalization",
+"options": ["A. 門診", "B. 檢查", "C. 住院", "D. 用藥"],
+"correctAnswer": "C. 住院"
+},
+{
+"question": "vaccination",
+"options": ["A. 檢查", "B. 治療", "C. 疫苗接種", "D. 手術"],
+"correctAnswer": "C. 疫苗接種"
+},
+{
+"question": "inoculate",
+"options": ["A. 注射", "B. 服藥", "C. 接種", "D. 檢測"],
+"correctAnswer": "C. 接種"
+},
+
+
+{
+"question": "cowpox",
+"options": ["A. 天花", "B. 水痘", "C. 牛痘", "D. 麻疹"],
+"correctAnswer": "C. 牛痘"
+},
+{
+"question": "disfigurement",
+"options": ["A. 康復", "B. 治癒", "C. 毀容", "D. 生病"],
+"correctAnswer": "C. 毀容"
+},
+{
+"question": "honorary",
+"options": ["A. 正式的", "B. 永久的", "C. 榮譽的", "D. 臨時的"],
+"correctAnswer": "C. 榮譽的"
+},
+{
+"question": "surgeon",
+"options": ["A. 醫生", "B. 護士", "C. 外科醫生", "D. 內科醫生"],
+"correctAnswer": "C. 外科醫生"
+},
+{
+"question": "variolae",
+"options": ["A. 水痘", "B. 麻疹", "C. 天花", "D. 風疹"],
+"correctAnswer": "C. 天花"
+},
+{
+"question": "visually impaired",
+"options": ["A. 聽力障礙的", "B. 語言障礙的", "C. 視力障礙的", "D. 肢體障礙的"],
+"correctAnswer": "C. 視力障礙的"
+},
+{
+"question": "veterans",
+"options": ["A. 新兵", "B. 學生", "C. 老兵", "D. 教師"],
+"correctAnswer": "C. 老兵"
+},
+{
+"question": "harness",
+"options": ["A. 繩子", "B. 項圈", "C. 馬具", "D. 牽繩"],
+"correctAnswer": "C. 馬具"
+},
+{
+"question": "obstacles",
+"options": ["A. 道路", "B. 橋梁", "C. 障礙物", "D. 標誌"],
+"correctAnswer": "C. 障礙物"
+},
+{
+"question": "temperament",
+"options": ["A. 外貌", "B. 身高", "C. 體重", "D. 氣質"],
+"correctAnswer": "D. 氣質"
+},
+{
+"question": "intelligent disobedience",
+"options": ["A. 固執", "B. 聽從", "C. 聰明服從", "D. 明智違抗"],
+"correctAnswer": "D. 明智違抗"
+},
+{
+"question": "interfere",
+"options": ["A. 幫助", "B. 支持", "C. 干擾", "D. 促進"],
+"correctAnswer": "C. 干擾"
+},
+{
+"question": "breeds",
+"options": ["A. 種子", "B. 數量", "C. 品種", "D. 年齡"],
+"correctAnswer": "C. 品種"
+},
+{
+"question": "Parkinson's disease",
+"options": ["A. 阿爾茨海默病", "B. 糖尿病", "C. 帕金森病", "D. 高血壓"],
+"correctAnswer": "C. 帕金森病"
+},
+{
+"question": "trembling",
+"options": ["A. 疼痛", "B. 發燒", "C. 顫抖", "D. 麻木"],
+"correctAnswer": "C. 顫抖"
+},
+{
+"question": "rigid",
+"options": ["A. 柔軟的", "B. 靈活的", "C. 僵硬的", "D. 鬆軟的"],
+"correctAnswer": "C. 僵硬的"
+},
+{
+"question": "dopamine",
+"options": ["A. 激素", "B. 維生素", "C. 多巴胺", "D. 抗生素"],
+"correctAnswer": "C. 多巴胺"
+},
+{
+"question": "levodopa",
+"options": ["A. 止痛藥", "B. 抗生素", "C. 左旋多巴", "D. 降壓藥"],
+"correctAnswer": "C. 左旋多巴"
+},
+{
+"question": "complications",
+"options": ["A. 康復", "B. 治癒", "C. 併發症", "D. 檢查"],
+"correctAnswer": "C. 併發症"
+},
+{
+"question": "hallucinations",
+"options": ["A. 失眠", "B. 頭痛", "C. 幻覺", "D. 疲勞"],
+"correctAnswer": "C. 幻覺"
+},
+{
+"question": "deprenyl",
+"options": ["A. 解熱藥", "B. 鎮痛藥", "C. 司來吉蘭", "D. 降糖藥"],
+"correctAnswer": "C. 司來吉蘭"
+},
+{
+"question": "Parkinsonism",
+"options": ["A. 帕金森病", "B. 阿爾茨海默病", "C. 帕金森綜合症", "D. 腦血栓"],
+"correctAnswer": "C. 帕金森綜合症"
+},
+{
+"question": "neurotoxin",
+"options": ["A. 細菌", "B. 病毒", "C. 神經毒素", "D. 抗生素"],
+"correctAnswer": "C. 神經毒素"
+},
+{
+"question": "contaminated",
+"options": ["A. 純淨的", "B. 乾淨的", "C. 受污染的", "D. 新鮮的"],
+"correctAnswer": "C. 受污染的"
+},
+
+{
+"question": "complexities",
+"options": ["A. 簡單性", "B. 直觀性", "C. 複雜性", "D. 單一性"],
+"correctAnswer": "C. 複雜性"
+},
+{
+"question": "emotionally-charged",
+"options": ["A. 平淡無奇的", "B. 枯燥乏味的", "C. 情緒飽滿的", "D. 邏輯清晰的"],
+"correctAnswer": "C. 情緒飽滿的"
+},
+{
+"question": "significance",
+"options": ["A. 表面性", "B. 瑣碎性", "C. 重要性", "D. 偶然性"],
+"correctAnswer": "C. 重要性"
+},
+{
+"question": "drawback",
+"options": ["A. 優勢", "B. 亮點", "C. 缺點", "D. 結果"],
+"correctAnswer": "C. 缺點"
+},
+{
+"question": "encode",
+"options": ["A. 遺忘", "B. 忽視", "C. 編碼", "D. 刪除"],
+"correctAnswer": "C. 編碼"
+},
+{
+"question": "sensorial",
+"options": ["A. 抽象的", "B. 主觀的", "C. 感官的", "D. 理性的"],
+"correctAnswer": "C. 感官的"
+},
+{
+"question": "contextual",
+"options": ["A. 孤立的", "B. 隨機的", "C. 語境的", "D. 單一的"],
+"correctAnswer": "C. 語境的"
+},
+{
+"question": "neutral",
+"options": ["A. 積極的", "B. 消極的", "C. 中立的", "D. 極端的"],
+"correctAnswer": "C. 中立的"
+},
+{
+"question": "arousal",
+"options": ["A. 平靜", "B. 抑制", "C. 喚起", "D. 結束"],
+"correctAnswer": "C. 喚起"
+},
+{
+"question": "mild depression",
+"options": ["A. 重度抑鬱", "B. 狂躁症", "C. 輕度抑鬱", "D. 焦慮症"],
+"correctAnswer": "C. 輕度抑鬱"
+},
+{
+"question": "evolving",
+"options": ["A. 退化", "B. 停滯", "C. 進化", "D. 固化"],
+"correctAnswer": "C. 進化"
+},
+{
+"question": "adapting",
+"options": ["A. 抗拒", "B. 偏執", "C. 適應", "D. 排斥"],
+"correctAnswer": "C. 適應"
+},
+{
+"question": "grumbling",
+"options": ["A. 稱讚", "B. 認可", "C. 抱怨", "D. 支持"],
+"correctAnswer": "C. 抱怨"
+},
+{
+"question": "facsimile",
+"options": ["A. 原件", "B. 草稿", "C. 傳真件", "D. 副本"],
+"correctAnswer": "C. 傳真件"
+},
+{
+"question": "construction",
+"options": ["A. 摧毀", "B. 拆卸", "C. 構造", "D. 破壞"],
+"correctAnswer": "C. 構造"
+},
+{
+"question": "identity",
+"options": ["A. 差異", "B. 分歧", "C. 身份", "D. 矛盾"],
+"correctAnswer": "C. 身份"
+},
+{
+"question": "persist",
+"options": ["A. 放棄", "B. 中斷", "C. 堅持", "D. 退卻"],
+"correctAnswer": "C. 堅持"
+},
+{
+"question": "undergo",
+"options": ["A. 規避", "B. 逃離", "C. 經歷", "D. 規避"],
+"correctAnswer": "C. 經歷"
+},
+{
+"question": "vowels",
+"options": ["A. 輔音", "B. 音標", "C. 元音", "D. 音節"],
+"correctAnswer": "C. 元音"
+},
+{
+"question": "pronounced",
+"options": ["A. 沉默的", "B. 隱藏的", "C. 發音的", "D. 無聲的"],
+"correctAnswer": "C. 發音的"
+},
+{
+"question": "auspicious",
+"options": ["A. 不祥的", "B. 晦氣的", "C. 吉祥的", "D. 平淡的"],
+"correctAnswer": "C. 吉祥的"
+},
+{
+"question": "delicate",
+"options": ["A. 粗糙的", "B. 粗劣的", "C. 精緻的", "D. 簡陋的"],
+"correctAnswer": "C. 精緻的"
+},
+{
+"question": "symbolic",
+"options": ["A. 直白的", "B. 淺顯的", "C. 象徵性的", "D. 表面的"],
+"correctAnswer": "C. 象徵性的"
+},
+{
+"question": "thunderous",
+"options": ["A. 輕微的", "B. 細小的", "C. 轟鳴的", "D. 安靜的"],
+"correctAnswer": "C. 轟鳴的"
+},
+{
+"question": "celestial",
+"options": ["A. 人間的", "B. 世俗的", "C. 天體的", "D. 地面的"],
+"correctAnswer": "C. 天體的"
+},
+{
+"question": "despondent",
+"options": ["A. 樂觀的", "B. 開朗的", "C. 沮喪的", "D. 興奮的"],
+"correctAnswer": "C. 沮喪的"
+},
+{
+"question": "commemorates",
+"options": ["A. 遺忘", "B. 忽視", "C. 紀念", "D. 忽視"],
+"correctAnswer": "C. 紀念"
+},
+{
+"question": "appease",
+"options": ["A. 激怒", "B. 挑釁", "C. 安撫", "D. 對抗"],
+"correctAnswer": "C. 安撫"
+},
+{
+"question": "devour",
+"options": ["A. 釋放", "B. 拯救", "C. 吞嚥", "D. 保護"],
+"correctAnswer": "C. 吞嚥"
+},
+{
+"question": "stuffed",
+"options": ["A. 中空的", "B. 空蕩的", "C. 填滿的", "D. 空虛的"],
+"correctAnswer": "C. 填滿的"
+},
+{
+"question": "emission",
+"options": ["A. 吸收", "B. 儲存", "C. 排放", "D. 積累"],
+"correctAnswer": "C. 排放"
+},
+{
+"question": "metabolism",
+"options": ["A. 分解", "B. 合成", "C. 新陳代謝", "D. 沉澱"],
+"correctAnswer": "C. 新陳代謝"
+},
+{
+"question": "fossil fuels",
+"options": ["A. 新能源", "B. 可再生能源", "C. 化石燃料", "D. 清潔能源"],
+"correctAnswer": "C. 化石燃料"
+},
+{
+"question": "clogged",
+"options": ["A. 通暢的", "B. 順利的", "C. 堵塞的", "D. 流動的"],
+"correctAnswer": "C. 堵塞的"
+},
+{
+"question": "hearth",
+"options": ["A. 爐灶", "B. 屋頂", "C. 門窗", "D. 牆壁"],
+"correctAnswer": "A. 爐灶"
+},
+{
+"question": "efficiency",
+"options": ["A. 浪費", "B. 低效", "C. 效率", "D. 損耗"],
+"correctAnswer": "C. 效率"
+},
+{
+"question": "transportation pattern",
+"options": ["A. 居住模式", "B. 工作模式", "C. 交通模式", "D. 生活模式"],
+"correctAnswer": "C. 交通模式"
+},
+{
+"question": "pediatrician",
+"options": ["A. 獸醫", "B. 工程師", "C. 兒科醫生", "D. 心理醫生"],
+"correctAnswer": "C. 兒科醫生"
+},
+{
+"question": "transmitted",
+"options": ["A. 隔離", "B. 阻斷", "C. 傳播", "D. 消滅"],
+"correctAnswer": "C. 傳播"
+},
+{
+"question": "salmonella",
+"options": ["A. 流感", "B. 麻疹", "C. 沙門氏菌", "D. 水痘"],
+"correctAnswer": "C. 沙門氏菌"
+},
+{
+"question": "rodents",
+"options": ["A. 鳥類", "B. 爬行類", "C. 嚙齒類", "D. 兩棲類"],
+"correctAnswer": "C. 嚙齒類"
+},
+{
+"question": "herpes B virus",
+"options": ["A. 乙肝病毒", "B. 流感病毒", "C. B型疱疹病毒", "D. 艾滋病毒"],
+"correctAnswer": "C. B型疱疹病毒"
+},
+{
+"question": "outbreaks",
+"options": ["A. 結束", "B. 消退", "C. 爆發", "D. 緩解"],
+"correctAnswer": "C. 爆發"
+},
+{
+"question": "minimise",
+"options": ["A. 擴大", "B. 增加", "C. 最小化", "D. 強化"],
+"correctAnswer": "C. 最小化"
+},
+{
+"question": "immune systems",
+"options": ["A. 消化系統", "B. 呼吸系統", "C. 免疫系統", "D. 循環系統"],
+"correctAnswer": "C. 免疫系統"
+},
+{
+"question": "allergies",
+"options": ["A. 炎症", "B. 創傷", "C. 過敏", "D. 感染"],
+"correctAnswer": "C. 過敏"
+},
+{
+"question": "inhibited",
+"options": ["A. 大膽的", "B. 開放的", "C. 拘謹的", "D. 活潑的"],
+"correctAnswer": "C. 拘謹的"
+},
+{
+"question": "proficient",
+"options": ["A. 生疏的", "B. 笨拙的", "C. 熟練的", "D. 陌生的"],
+"correctAnswer": "C. 熟練的"
+},
+{
+"question": "mime",
+"options": ["A. 書寫", "B. 演講", "C. 啞劇", "D. 歌唱"],
+"correctAnswer": "C. 啞劇"
+},
+{
+"question": "exploit",
+"options": ["A. 浪費", "B. 忽視", "C. 利用", "D. 拋棄"],
+"correctAnswer": "C. 利用"
+},
+{
+"question": "infer",
+"options": ["A. 猜測", "B. 忘記", "C. 推斷", "D. 忽視"],
+"correctAnswer": "C. 推斷"
+},
+{
+"question": "taboos",
+"options": ["A. 習俗", "B. 傳統", "C. 禁忌", "D. 禮儀"],
+"correctAnswer": "C. 禁忌"
+},
+{
+"question": "offend",
+"options": ["A. 討好", "B. 尊重", "C. 冒犯", "D. 讚揚"],
+"correctAnswer": "C. 冒犯"
+},
+{
+"question": "inauspicious",
+"options": ["A. 吉祥的", "B. 幸運的", "C. 不祥的", "D. 順利的"],
+"correctAnswer": "C. 不祥的"
+},
+{
+"question": "twiddling",
+"options": ["A. 握住", "B. 放下", "C. 捻弄", "D. 丟棄"],
+"correctAnswer": "C. 捻弄"
+},
+{
+"question": "banquet",
+"options": ["A. 便餐", "B. 小吃", "C. 宴會", "D. 快餐"],
+"correctAnswer": "C. 宴會"
+},
+{
+"question": "insufficient",
+"options": ["A. 充足的", "B. 過剩的", "C. 不足的", "D. 豐富的"],
+"correctAnswer": "C. 不足的"
+},
+{
+"question": "beware",
+"options": ["A. 忽視", "B. 放鬆", "C. 提防", "D. 信任"],
+"correctAnswer": "C. 提防"
+},
+{
+"question": "slurps",
+"options": ["A. 細嚼", "B. 慢咽", "C. 吸溜聲", "D. 吞嚥"],
+"correctAnswer": "C. 吸溜聲"
+},
+{
+"question": "disrespectful",
+"options": ["A. 尊敬的", "B. 禮貌的", "C. 無禮的", "D. 謙虛的"],
+"correctAnswer": "C. 無禮的"
+},
+{
+"question": "reserved",
+"options": ["A. 開放的", "B. 公開的", "C. 保留的", "D. 共用的"],
+"correctAnswer": "C. 保留的"
+},
+{
+"question": "paramount",
+"options": ["A. 次要的", "B. 無關的", "C. 至關重要的", "D. 普通的"],
+"correctAnswer": "C. 至關重要的"
+}
+
+  ]
+};
+
+
+const bgThemes = [
+  "linear-gradient(180deg, #a8e0ff, #8ee3f5, #f9f9f9)",
+  "linear-gradient(180deg, #ffecd2, #fcb69f)",
+  "linear-gradient(180deg, #c9ffbf, #ffafbd)",
+  "linear-gradient(180deg, #f6d365, #fda085)",
+  "linear-gradient(180deg, #89f7fe, #66a6ff)",
+  "linear-gradient(180deg, #ff9a9e, #fecfef, #fe99a7)"
+];
+// DOM 元素選擇
+const $ = id => document.getElementById(id);
+let selectedCategories = new Set();
+let selectedQuestions = [];
+let current = 0, score = 0, wrongAnswers = [];
+let isAnswered = false; // 標記是否已作答
+
+// 工具函數
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+function speakZh(t) {
+  const u = new SpeechSynthesisUtterance(t);
+  u.lang = "zh-HK";
+  u.rate = 0.9;
+  speechSynthesis.speak(u);
+}
+function speakEn(t) {
+  const u = new SpeechSynthesisUtterance(t);
+  u.lang = "en-US";
+  u.rate = 0.9;
+  speechSynthesis.speak(u);
+}
+function changeBackground() {
+  document.body.style.background = bgThemes[Math.floor(Math.random() * bgThemes.length)];
+}
+function showScreen(screenName) {
+  document.querySelectorAll('#game-container > div').forEach(div => {
+    div.classList.add('hidden');
+  });
+  $(screenName).classList.remove('hidden');
+}
+// 類別選擇功能
+function toggleCategory(categoryNumber) {
+  const checkbox = $(`category${categoryNumber}`);
+  const card = checkbox.parentElement;
+  
+  if (selectedCategories.has(categoryNumber)) {
+    selectedCategories.delete(categoryNumber);
+    card.classList.remove('selected');
+    checkbox.checked = false;
+  } else {
+    selectedCategories.add(categoryNumber);
+    card.classList.add('selected');
+    checkbox.checked = true;
+  }
+  
+  updateSelectionCount();
+  updateStartButton();
+}
+function updateSelectionCount() {
+  $('selected-count').textContent = selectedCategories.size;
+}
+function updateStartButton() {
+  $('start-quiz-btn').disabled = selectedCategories.size === 0;
+}
+// 開始測驗
+function startQuiz() {
+  if (selectedCategories.size === 0) return;
+  
+  // 從選擇的類別中收集所有題目
+  let allQuestions = [];
+  selectedCategories.forEach(cat => {
+    allQuestions = allQuestions.concat(quizQuestions[`category${cat}`]);
+  });
+  
+  // 隨機選擇10題
+  selectedQuestions = shuffle([...allQuestions]).slice(0, 10);
+  current = 0;
+  score = 0;
+  wrongAnswers = [];
+  isAnswered = false; // 重置作答標記
+  
+  showScreen('quiz-screen');
+  showQuestion();
+}
+// 測驗功能
+function showQuestion() {
+  changeBackground();
+  const q = selectedQuestions[current];
+  $('question').textContent = q.question;
+  $('options').innerHTML = '';
+  isAnswered = false; // 重置作答標記
+  
+  q.options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.textContent = opt;
+    btn.onclick = () => checkAnswer(opt);
+    $('options').appendChild(btn);
+  });
+  
+  $('result').textContent = '';
+  $('next-btn').classList.add('hidden');
+  $('scoreboard').textContent = `進度：${current + 1}/${selectedQuestions.length}`;
+}
+function checkAnswer(selected) {
+  if (isAnswered) return; // 已作答則阻止重複提交
+  isAnswered = true; // 標記為已作答
+  
+  const q = selectedQuestions[current];
+  const word = q.question; // 直接獲取單詞（無需匹配引號）
+  const correctChinese = q.correctAnswer.split('. ')[1] || q.correctAnswer;
+  
+  // 禁用所有選項按鈕
+  document.querySelectorAll('.option').forEach(btn => {
+    btn.disabled = true;
+  });
+  
+  if (selected === q.correctAnswer) {
+    score++;
+    $('result').textContent = '✅ 答啱左！';
+    speakZh('答啱左！');
+  } else {
+    $('result').textContent = `❌ 錯！正確答案係：${q.correctAnswer}`;
+    speakZh(`錯！正確答案係 ${correctChinese}`);
+    // 存儲完整的错题信息
+    wrongAnswers.push({
+      question: q.question,
+      word: word,
+      correctAnswer: q.correctAnswer,
+      correctChinese: correctChinese,
+      selectedAnswer: selected
+    });
+  }
+  $('next-btn').classList.remove('hidden');
+}
+// 事件監聽
+$('start-btn').onclick = () => showScreen('category-screen');
+$('start-quiz-btn').onclick = startQuiz;
+$('speak-word').onclick = () => {
+  const currentWord = selectedQuestions[current].question;
+  speakEn(currentWord); // 直接朗讀英文單詞
+};
+$('next-btn').onclick = () => {
+  speechSynthesis.cancel();
+  current++;
+  if (current < selectedQuestions.length) {
+    showQuestion();
+  } else {
+    endGame();
+  }
+};
+function endGame() {
+  showScreen('end-screen');
+  $('final-score').textContent = `🏆 你的最終分數：${score}/${selectedQuestions.length}`;
+  
+  if (wrongAnswers.length > 0) {
+    let wrongListHTML = '📝 錯題列表（單詞 = 正確中文意思）：<br><br>';
+    
+    wrongAnswers.forEach((item, index) => {
+      wrongListHTML += `${index + 1}. <strong>${item.word}</strong> = ${item.correctChinese}<br>`;
+    });
+    
+    $('wrong-list').innerHTML = wrongListHTML;
+  } else {
+    $('wrong-list').innerHTML = '🎯 全部答啱，太勁啦！';
+  }
+  
+  speakZh('俾心機，你下次一定可以拎滿分。');
+}
+// 初始化
+updateSelectionCount();
+</script>
+</body>
+</html>
