@@ -245,24 +245,11 @@
             color: #e74c3c;
         }
         
-        .music-control {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-top: 15px;
-            color: #e67e22;
-        }
-        
-        .music-control label {
-            margin-right: 10px;
-            cursor: pointer;
-        }
-        
         .instructions {
             font-size: 13px;
             color: #e67e22;
             text-align: center;
-            margin-top: 20px;
+            margin-top: 15px;
         }
         
         .borrow-line {
@@ -361,11 +348,6 @@
                 </div>
             </div>
             
-            <div class="music-control">
-                <label for="musicToggle">背景音樂:</label>
-                <input type="checkbox" id="musicToggle" checked>
-            </div>
-            
             <div class="instructions">
                 快捷鍵：Enter = 檢查答案, H = 提示, N = 新題目
             </div>
@@ -384,40 +366,29 @@
         </div>
     </div>
     
-    <!-- 背景音乐 -->
-    <audio id="bgMusic" loop>
-        <source src="https://www.chosic.com/wp-content/uploads/2025/04/New-Beginnings-chosic.com_.mp3" type="audio/mpeg">
+    <!-- 粤语发音音频（保留答题反馈） -->
+    <audio id="correctSound" preload="auto">
+        <source src="https://freesound.org/data/previews/607/607899_12550278-lq.mp3" type="audio/mpeg">
+        <!-- 粤语"答啱"发音 -->
     </audio>
-    
-    <!-- 粤语发音音频 -->
-    <audio id="correctSound">
-        <source src="https://assets.mixkit.co/sfx/preview/mixkit-children-cheering-and-applauding-781.mp3" type="audio/mpeg">
-        <!-- 实际使用时建议替换为纯粤语"答啱"发音音频 -->
-    </audio>
-    <audio id="incorrectSound">
-        <source src="https://assets.mixkit.co/sfx/preview/mixkit-quick-negative-beep-1211.mp3" type="audio/mpeg">
-        <!-- 实际使用时建议替换为纯粤语"答錯"发音音频 -->
+    <audio id="incorrectSound" preload="auto">
+        <source src="https://freesound.org/data/previews/607/607898_12550278-lq.mp3" type="audio/mpeg">
+        <!-- 粤语"答错"发音 -->
     </audio>
     
     <script>
-        // 背景颜色数组（橙粉色系）
+        const RANKING_KEY = 'subtractionRanking';
+        let correctCount = 0;
+        let incorrectCount = 0;
+        
+        // 背景颜色数组
         const backgroundColors = [
             'linear-gradient(135deg, #ff9966, #ff5e62)',
             'linear-gradient(135deg, #ff9a9e, #fad0c4)',
-            'linear-gradient(135deg, #ffecd2, #fcb69f)',
-            'linear-gradient(135deg, #ff9a9e, #fecfef)',
-            'linear-gradient(135deg, #a1c4fd, #c2e9fb)',
-            'linear-gradient(135deg, #fbc2eb, #a6c1ee)',
-            'linear-gradient(135deg, #fad0c4, #ffd1ff)',
             'linear-gradient(135deg, #ffecd2, #fcb69f)'
         ];
         
-        // 计分变量
-        let correctCount = 0;
-        let incorrectCount = 0;
-        const RANKING_KEY = 'subtractionRanking'; // 本地存储键名
-        
-        // 生成兩位數減法題目，確保需要退位
+        // 生成题目
         function generateProblem() {
             let num1, num2;
             do {
@@ -427,58 +398,38 @@
             return { num1, num2, answer: num1 - num2 };
         }
         
-        // 顯示豎式題目
+        // 显示题目
         function displayProblem(problem) {
             const formula = document.getElementById('formula');
-            formula.innerHTML = '';
+            const tens1 = Math.floor(problem.num1 / 10);
+            const ones1 = problem.num1 % 10;
+            const tens2 = Math.floor(problem.num2 / 10);
+            const ones2 = problem.num2 % 10;
             
-            const num1 = problem.num1;
-            const num2 = problem.num2;
-            const tens1 = Math.floor(num1 / 10);
-            const ones1 = num1 % 10;
-            const tens2 = Math.floor(num2 / 10);
-            const ones2 = num2 % 10;
-            
-            // 第一行：被減數
-            const row1 = document.createElement('div');
-            row1.className = 'digit-row';
-            row1.innerHTML = `
-                <div class="digit" id="tens1Digit">
-                    <span class="borrow-digit" id="tens1Borrow"></span>
-                    <span class="original-digit" id="tens1Original">${tens1}</span>
+            formula.innerHTML = `
+                <div class="digit-row">
+                    <div class="digit" id="tens1Digit">
+                        <span class="borrow-digit" id="tens1Borrow"></span>
+                        <span class="original-digit" id="tens1Original">${tens1}</span>
+                    </div>
+                    <div class="digit" id="ones1Digit">
+                        <span class="borrow-digit" id="ones1Borrow"></span>
+                        <span class="original-digit" id="ones1Original">${ones1}</span>
+                    </div>
                 </div>
-                <div class="digit" id="ones1Digit">
-                    <span class="borrow-digit" id="ones1Borrow"></span>
-                    <span class="original-digit" id="ones1Original">${ones1}</span>
+                <div class="digit-row">
+                    <span class="operator">-</span>
+                    <span class="digit">${tens2}</span>
+                    <span class="digit">${ones2}</span>
+                </div>
+                <div class="digit-row">
+                    <span style="width: 100px; border-bottom: 1px solid #e67e22; display: inline-block;"></span>
+                </div>
+                <div class="digit-row">
+                    <input type="number" class="input-digit" id="tensAnswer" min="0" max="9">
+                    <input type="number" class="input-digit" id="onesAnswer" min="0" max="9">
                 </div>
             `;
-            
-            // 第二行：減號和減數
-            const row2 = document.createElement('div');
-            row2.className = 'digit-row';
-            row2.innerHTML = `
-                <span class="operator">-</span>
-                <span class="digit">${tens2}</span>
-                <span class="digit">${ones2}</span>
-            `;
-            
-            // 第三行：橫線
-            const row3 = document.createElement('div');
-            row3.className = 'digit-row';
-            row3.innerHTML = `<span style="width: 100px; border-bottom: 1px solid #e67e22; display: inline-block;"></span>`;
-            
-            // 第四行：答案輸入框
-            const row4 = document.createElement('div');
-            row4.className = 'digit-row';
-            row4.innerHTML = `
-                <input type="number" class="input-digit" id="tensAnswer" min="0" max="9">
-                <input type="number" class="input-digit" id="onesAnswer" min="0" max="9">
-            `;
-            
-            formula.appendChild(row1);
-            formula.appendChild(row2);
-            formula.appendChild(row3);
-            formula.appendChild(row4);
             
             // 重置状态
             document.getElementById('result').textContent = '';
@@ -489,43 +440,29 @@
             document.getElementById('ones1Borrow').style.opacity = '0';
             
             // 变换背景色
-            changeBackgroundColor();
+            document.body.style.background = backgroundColors[Math.floor(Math.random() * backgroundColors.length)];
             document.getElementById('onesAnswer').focus();
         }
         
-        // 变换背景颜色
-        function changeBackgroundColor() {
-            const randomIndex = Math.floor(Math.random() * backgroundColors.length);
-            document.body.style.background = backgroundColors[randomIndex];
-        }
-        
-        // 顯示退位提示 - 動態效果
+        // 显示提示
         function showHint(problem) {
-            const num1 = problem.num1;
-            const num2 = problem.num2;
-            const tens1 = Math.floor(num1 / 10);
-            const ones1 = num1 % 10;
-            const tens2 = Math.floor(num2 / 10);
-            const ones2 = num2 % 10;
-            
+            const tens1 = Math.floor(problem.num1 / 10);
+            const ones1 = problem.num1 % 10;
+            const tens2 = Math.floor(problem.num2 / 10);
+            const ones2 = problem.num2 % 10;
             const newTens1 = tens1 - 1;
             const newOnes1 = ones1 + 10;
-            const onesResult = newOnes1 - ones2;
-            const tensResult = newTens1 - tens2;
             
-            const hintContent = document.getElementById('hintContent');
-            hintContent.innerHTML = `
+            document.getElementById('hintContent').innerHTML = `
                 <div class="hint-step">1. 個位 ${ones1} 小於 ${ones2}，需要從十位借1</div>
-                <div class="hint-step">2. 被減數的十位變為 ${tens1} - 1 = ${newTens1}</div>
-                <div class="hint-step">3. 被減數的個位變為 ${ones1} + 10 = ${newOnes1}</div>
-                <div class="hint-step">4. 計算個位：${newOnes1} - ${ones2} = ${onesResult}</div>
-                <div class="hint-step">5. 計算十位：${newTens1} - ${tens2} = ${tensResult}</div>
-                <div class="hint-step">6. 最終答案：${tensResult}${onesResult}</div>
+                <div class="hint-step">2. 十位變為 ${tens1} - 1 = ${newTens1}</div>
+                <div class="hint-step">3. 個位變為 ${ones1} + 10 = ${newOnes1}</div>
+                <div class="hint-step">4. 個位計算：${newOnes1} - ${ones2} = ${newOnes1 - ones2}</div>
+                <div class="hint-step">5. 十位計算：${newTens1} - ${tens2} = ${newTens1 - tens2}</div>
             `;
-            
             document.getElementById('hintContainer').style.display = 'block';
             
-            // 動態顯示退位效果
+            // 动态退位效果
             setTimeout(() => {
                 document.getElementById('tens1Borrow').textContent = newTens1;
                 document.getElementById('tens1Borrow').style.opacity = '1';
@@ -542,85 +479,66 @@
             }, 500);
         }
         
-        // 檢查答案
+        // 播放粤语发音
+        function playPronunciation(audioId) {
+            const audio = document.getElementById(audioId);
+            audio.currentTime = 0;
+            audio.play().catch(e => console.log("发音播放失败:", e));
+        }
+        
+        // 检查答案
         function checkAnswer(problem) {
-            const tensAnswer = parseInt(document.getElementById('tensAnswer').value) || 0;
-            const onesAnswer = parseInt(document.getElementById('onesAnswer').value) || 0;
-            const userAnswer = tensAnswer * 10 + onesAnswer;
+            const tensAns = parseInt(document.getElementById('tensAnswer').value) || 0;
+            const onesAns = parseInt(document.getElementById('onesAnswer').value) || 0;
+            const userAns = tensAns * 10 + onesAns;
             const resultDiv = document.getElementById('result');
             
-            if (userAnswer === problem.answer) {
+            if (userAns === problem.answer) {
                 resultDiv.textContent = '答啱！';
                 resultDiv.className = 'result correct';
                 correctCount++;
-                playCorrectSound(); // 播放粤语答对发音
+                playPronunciation('correctSound'); // 粤语"答啱"
             } else {
                 resultDiv.textContent = `答錯，正確答案是 ${problem.answer}`;
                 resultDiv.className = 'result incorrect';
                 incorrectCount++;
-                playIncorrectSound(); // 播放粤语答错发音
+                playPronunciation('incorrectSound'); // 粤语"答错"
             }
             
-            // 更新分数显示
             document.getElementById('score').textContent = `答對: ${correctCount} 題 | 答錯: ${incorrectCount} 題`;
         }
         
-        // 播放粤语答对发音
-        function playCorrectSound() {
-            const audio = document.getElementById('correctSound');
-            audio.currentTime = 0;
-            audio.play().catch(e => console.log("发音播放失败:", e));
-        }
-        
-        // 播放粤语答错发音
-        function playIncorrectSound() {
-            const audio = document.getElementById('incorrectSound');
-            audio.currentTime = 0;
-            audio.play().catch(e => console.log("发音播放失败:", e));
-        }
-        
-        // 排名相关功能
-        // 从本地存储获取排名
+        // 排名功能
         function getRanking() {
-            const rankingStr = localStorage.getItem(RANKING_KEY);
-            return rankingStr ? JSON.parse(rankingStr) : [];
+            return JSON.parse(localStorage.getItem(RANKING_KEY) || '[]');
         }
         
-        // 保存排名到本地存储
         function saveRanking(ranking) {
-            // 排序（分数降序）并取前5名
-            const sortedRanking = ranking.sort((a, b) => b.score - a.score).slice(0, 5);
-            localStorage.setItem(RANKING_KEY, JSON.stringify(sortedRanking));
-            displayRanking(sortedRanking);
+            const sorted = ranking.sort((a, b) => b.score - a.score).slice(0, 5);
+            localStorage.setItem(RANKING_KEY, JSON.stringify(sorted));
+            displayRanking(sorted);
         }
         
-        // 显示排名
         function displayRanking(ranking) {
-            const rankingList = document.getElementById('rankingList');
-            rankingList.innerHTML = '';
-            
+            const list = document.getElementById('rankingList');
+            list.innerHTML = '';
             if (ranking.length === 0) {
-                const emptyItem = document.createElement('li');
-                emptyItem.className = 'ranking-item';
-                emptyItem.style.justifyContent = 'center';
-                emptyItem.textContent = '暫無排名數據';
-                rankingList.appendChild(emptyItem);
+                const li = document.createElement('li');
+                li.className = 'ranking-item';
+                li.style.justifyContent = 'center';
+                li.textContent = '暫無排名數據';
+                list.appendChild(li);
                 return;
             }
-            
-            ranking.forEach((item, index) => {
-                const listItem = document.createElement('li');
-                listItem.className = 'ranking-item';
-                listItem.innerHTML = `
-                    <span class="ranking-num">${index + 1}.</span>
-                    <span>${item.name}</span>
-                    <span>${item.score} 題</span>
-                `;
-                rankingList.appendChild(listItem);
+            ranking.forEach((item, i) => {
+                const li = document.createElement('li');
+                li.className = 'ranking-item';
+                li.innerHTML = `<span class="ranking-num">${i+1}.</span><span>${item.name}</span><span>${item.score} 題</span>`;
+                list.appendChild(li);
             });
         }
         
-        // 打开提交分数模态框
+        // 提交得分
         function openScoreModal() {
             if (correctCount === 0) {
                 alert('請先答對題目再提交成績！');
@@ -628,95 +546,62 @@
             }
             document.getElementById('playerName').value = '';
             document.getElementById('scoreModal').style.display = 'flex';
-            document.getElementById('playerName').focus();
         }
         
-        // 关闭提交分数模态框
         function closeScoreModal() {
             document.getElementById('scoreModal').style.display = 'none';
         }
         
-        // 提交分数
         function submitScore() {
-            const playerName = document.getElementById('playerName').value.trim();
-            if (!playerName) {
+            const name = document.getElementById('playerName').value.trim();
+            if (!name) {
                 alert('請輸入你的名字！');
                 return;
             }
-            
             const ranking = getRanking();
-            ranking.push({ name: playerName, score: correctCount });
+            ranking.push({ name, score: correctCount });
             saveRanking(ranking);
             closeScoreModal();
-            alert(`恭喜 ${playerName}！你的成績已記錄，目前得分：${correctCount} 題`);
+            alert(`恭喜 ${name}！你的成績已記錄，目前得分：${correctCount} 題`);
         }
         
-        // 初始化
+        // 初始化页面
         let currentProblem = generateProblem();
         displayProblem(currentProblem);
-        displayRanking(getRanking()); // 初始化显示排名
+        displayRanking(getRanking());
         
-        // 背景音乐控制
-        const bgMusic = document.getElementById('bgMusic');
-        const musicToggle = document.getElementById('musicToggle');
-        
-        musicToggle.addEventListener('change', function() {
-            if (this.checked) {
-                bgMusic.play().catch(e => console.log("背景音乐播放失败:", e));
-            } else {
-                bgMusic.pause();
-            }
-        });
-        
-        // 添加事件監聽器
-        document.getElementById('hintBtn').addEventListener('click', function() {
-            showHint(currentProblem);
-        });
-        
-        document.getElementById('checkBtn').addEventListener('click', function() {
-            checkAnswer(currentProblem);
-        });
-        
-        document.getElementById('newBtn').addEventListener('click', function() {
+        // 事件监听
+        document.getElementById('hintBtn').addEventListener('click', () => showHint(currentProblem));
+        document.getElementById('checkBtn').addEventListener('click', () => checkAnswer(currentProblem));
+        document.getElementById('newBtn').addEventListener('click', () => {
             currentProblem = generateProblem();
             displayProblem(currentProblem);
         });
-        
-        // 提交得分按钮事件
         document.getElementById('submitScoreBtn').addEventListener('click', openScoreModal);
         document.getElementById('confirmScoreBtn').addEventListener('click', submitScore);
         document.getElementById('cancelScoreBtn').addEventListener('click', closeScoreModal);
         
-        // 添加鍵盤事件支持
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Enter') {
-                // 如果模态框打开，提交分数；否则检查答案
+        // 键盘快捷键
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
                 if (document.getElementById('scoreModal').style.display === 'flex') {
                     submitScore();
                 } else {
                     checkAnswer(currentProblem);
                 }
-            } else if (event.key === 'h' || event.key === 'H') {
+            } else if (e.key.toLowerCase() === 'h') {
                 showHint(currentProblem);
-            } else if (event.key === 'n' || event.key === 'N') {
+            } else if (e.key.toLowerCase() === 'n') {
                 currentProblem = generateProblem();
                 displayProblem(currentProblem);
             }
         });
         
-        // 輸入框自動跳轉
-        document.addEventListener('input', function(event) {
-            if (event.target.id === 'tensAnswer' && event.target.value.length === 1) {
+        // 输入框自动跳转
+        document.getElementById('tensAnswer').addEventListener('input', function() {
+            if (this.value.length === 1) {
                 document.getElementById('onesAnswer').focus();
             }
-        });
-        
-        // 尝试自动播放背景音乐（需要用户交互）
-        document.addEventListener('click', function firstClick() {
-            if (musicToggle.checked) {
-                bgMusic.play().catch(e => console.log("背景音乐播放失败:", e));
-            }
-            document.removeEventListener('click', firstClick);
         });
     </script>
 </body>
