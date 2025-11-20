@@ -1,1 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Functions Adventure</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+        }
+        
+        #game-container {
+            width: 95%;
+            max-width: 500px;
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .screen {
+            padding: 20px;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            min-height: 600px;
+            justify-content: center;
+        }
+        
+        #start-screen {
+            display: flex;
+            background: linear-gradient(45deg, #ff9a9e 0%, #fad0c4 100%);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            color: #ff5722;
+            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        h2 {
+            font-size: 2rem;
+            color: #2196f3;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        
+        p {
+            font-size: 1.5rem;
+            line-height: 1.6;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .code-example {
+            background-color: #f5f5f5;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 1.4rem;
+            width: 100%;
+            overflow-x: auto;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #ff5722, #ff9800);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 15px 30px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            margin: 10px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        .option {
+            background: linear-gradient(45deg, #4caf50, #8bc34a);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 15px;
+            font-size: 1.4rem;
+            margin: 8px 0;
+            cursor: pointer;
+            text-align: left;
+            transition: transform 0.2s;
+        }
+        
+        .option:hover {
+            transform: scale(1.02);
+        }
+        
+        .feedback {
+            font-size: 1.6rem;
+            font-weight: bold;
+            margin: 15px 0;
+            padding: 10px;
+            border-radius: 10px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .correct {
+            background-color: #e8f5e9;
+            color: #4caf50;
+            border: 2px solid #4caf50;
+        }
+        
+        .incorrect {
+            background-color: #ffebee;
+            color: #f44336;
+            border: 2px solid #f44336;
+        }
+        
+        #score-display {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #ff5722;
+            color: white;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        #ranking-list {
+            width: 100%;
+            list-style-type: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+        
+        #ranking-list li {
+            background: #e3f2fd;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1.4rem;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        #player-name {
+            font-size: 1.5rem;
+            padding: 10px;
+            border: 2px solid #2196f3;
+            border-radius: 10px;
+            width: 100%;
+            margin: 15px 0;
+        }
+        
+        #music-control {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: #9c27b0;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        @media (max-width: 500px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            h2 {
+                font-size: 1.7rem;
+            }
+            
+            p, .code-example, .option {
+                font-size: 1.2rem;
+            }
+            
+            .btn {
+                font-size: 1.3rem;
+                padding: 12px 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <button id="music-control">🔊</button>
+        <div id="score-display">0</div>
+        
+        <!-- Start Screen -->
+        <div id="start-screen" class="screen">
+            <h1>Python Functions Adventure!</h1>
+            <p>Join Professor Python on a magical journey to learn about functions in Python!</p>
+            <p>Complete 20 fun challenges and become a Python master!</p>
+            <button id="start-btn" class="btn">Start Adventure!</button>
+        </div>
+        
+        <!-- Question Screens -->
+        <div id="question-screen" class="screen">
+            <h2 id="question-title">Question 1</h2>
+            <div id="story-content">
+                <p id="story-text"></p>
+                <div id="code-example" class="code-example"></div>
+            </div>
+            <div class="options-container">
+                <button class="option" data-option="A"></button>
+                <button class="option" data-option="B"></button>
+                <button class="option" data-option="C"></button>
+            </div>
+            <div id="feedback" class="feedback"></div>
+            <button id="next-btn" class="btn" style="display: none;">Next Question</button>
+        </div>
+        
+        <!-- End Screen -->
+        <div id="end-screen" class="screen">
+            <h1>Congratulations!</h1>
+            <p>You've completed the Python Functions Adventure!</p>
+            <p>Your final score: <span id="final-score">0</span></p>
+            <input type="text" id="player-name" placeholder="Enter your name">
+            <button id="save-score-btn" class="btn">Save My Score</button>
+            <h2>Leaderboard</h2>
+            <ul id="ranking-list"></ul>
+            <button id="play-again-btn" class="btn">Play Again</button>
+        </div>
+    </div>
+
+    <audio id="background-music" loop>
+        <source src="https://www.chosic.com/wp-content/uploads/2025/04/New-Beginnings-chosic.com_.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <script>
+        // Game data
+        const questions = [
+            {
+                story: "Professor Python says: 'Functions are like magic spells in programming! We use the keyword <strong>def</strong> to create them.'",
+                code: "def say_hello():\n    print('Hello, friend!')",
+                question: "What keyword do we use to create a function in Python?",
+                options: ["function", "def", "create"],
+                correct: "B"
+            },
+            {
+                story: "Professor Python shows you how to call a function: 'After defining a function, we need to call it to make it work!'",
+                code: "def say_hello():\n    print('Hello, friend!')\n\n# How do we call the function?",
+                question: "How do we call the function say_hello?",
+                options: ["say_hello()", "call say_hello", "def say_hello()"],
+                correct: "C"
+            },
+            {
+                story: "Professor Python explains: 'Functions can have parameters - special words that we put inside the parentheses.'",
+                code: "def greet(name):\n    print('Hello, ' + name + '!')",
+                question: "What is the parameter in this function?",
+                options: ["greet", "print", "name"],
+                correct: "C"
+            },
+            {
+                story: "Professor Python says: 'We can give functions multiple parameters to make them more powerful!'",
+                code: "def add_numbers(a, b):\n    result = a + b\n    return result",
+                question: "How many parameters does this function have?",
+                options: ["One", "Two", "Three"],
+                correct: "B"
+            },
+            {
+                story: "Professor Python explains: 'The return statement sends a value back from the function.'",
+                code: "def multiply(x, y):\n    return x * y",
+                question: "What does this function return?",
+                options: ["The product of x and y", "The sum of x and y", "Nothing"],
+                correct: "A"
+            },
+            {
+                story: "Professor Python says: 'Functions help us avoid repeating code. We write it once and use it many times!'",
+                code: "def draw_square():\n    for i in range(4):\n        print('*' * 10)",
+                question: "How many times will this function print stars?",
+                options: ["One time", "Four times", "Ten times"],
+                correct: "C"
+            },
+            {
+                story: "Professor Python shows: 'We can call functions from inside other functions!'",
+                code: "def morning_routine():\n    wake_up()\n    brush_teeth()\n    eat_breakfast()",
+                question: "How many functions are called inside morning_routine?",
+                options: ["One", "Three", "Four"],
+                correct: "B"
+            },
+            {
+                story: "Professor Python explains: 'Functions can have default values for parameters.'",
+                code: "def greet(name='friend'):\n    print('Hello, ' + name)",
+                question: "What will be printed if we call greet() without arguments?",
+                options: ["Hello, name", "Hello, friend", "Nothing"],
+                correct: "C"
+            },
+            {
+                story: "Professor Python says: 'We can use functions to organize our code into logical parts.'",
+                code: "def calculate_area(length, width):\n    area = length * width\n    return area",
+                question: "What does this function calculate?",
+                options: ["The area of a rectangle", "The perimeter of a rectangle", "The volume of a box"],
+                correct: "A"
+            },
+            {
+                story: "Professor Python explains: 'Functions make our code easier to read and understand.'",
+                code: "def is_even(number):\n    if number % 2 == 0:\n        return True\n    else:\n        return False",
+                question: "What does this function check?",
+                options: ["If a number is positive", "If a number is even", "If a number is zero"],
+                correct: "B"
+            },
+            {
+                story: "Professor Python says: 'We can create functions that call themselves - this is called recursion!'",
+                code: "def countdown(n):\n    if n <= 0:\n        print('Blastoff!')\n    else:\n        print(n)\n        countdown(n-1)",
+                question: "What programming concept is demonstrated here?",
+                options: ["Recursion", "Looping", "Conditionals"],
+                correct: "A"
+            },
+            {
+                story: "Professor Python shows: 'Functions can return multiple values using tuples.'",
+                code: "def get_dimensions():\n    return 10, 20, 30",
+                question: "How many values does this function return?",
+                options: ["One", "Two", "Three"],
+                correct: "C"
+            },
+            {
+                story: "Professor Python explains: 'We can use functions to validate input.'",
+                code: "def validate_age(age):\n    if age >= 0 and age <= 120:\n        return True\n    return False",
+                question: "What does this function validate?",
+                options: ["If age is a number", "If age is between 0 and 120", "If age is positive"],
+                correct: "B"
+            },
+            {
+                story: "Professor Python says: 'Functions can have docstrings to explain what they do.'",
+                code: "def add(a, b):\n    '''This function adds two numbers.'''\n    return a + b",
+                question: "What is the purpose of the text between triple quotes?",
+                options: ["It's a comment explaining the function", "It's code that will be executed", "It's a special Python command"],
+                correct: "A"
+            },
+            {
+                story: "Professor Python shows: 'We can use functions to create reusable patterns.'",
+                code: "def draw_triangle(size):\n    for i in range(1, size+1):\n        print('*' * i)",
+                question: "What will draw_triangle(3) print?",
+                options: ["A square", "A triangle with 3 rows", "Three stars in a line"],
+                correct: "C"
+            },
+            {
+                story: "Professor Python explains: 'Functions help us debug code by isolating problems.'",
+                code: "def calculate_grade(score):\n    if score >= 90:\n        return 'A'\n    elif score >= 80:\n        return 'B'\n    else:\n        return 'C'",
+                question: "What grade will this function return for a score of 85?",
+                options: ["A", "B", "C"],
+                correct: "B"
+            },
+            {
+                story: "Professor Python says: 'We can nest functions inside other functions.'",
+                code: "def outer():\n    def inner():\n        print('Inside inner function')\n    inner()",
+                question: "Which function is defined inside another function?",
+                options: ["outer", "inner", "print"],
+                correct: "A"
+            },
+            {
+                story: "Professor Python explains: 'Functions can accept any number of arguments using *args.'",
+                code: "def sum_all(*args):\n    total = 0\n    for num in args:\n        total += num\n    return total",
+                question: "What special syntax allows this function to take any number of arguments?",
+                options: ["*args", "for num in args", "total += num"],
+                correct: "A"
+            },
+            {
+                story: "Professor Python shows: 'We can use functions to create simple games.'",
+                code: "def play_game():\n    secret = 7\n    guess = int(input('Guess a number: '))\n    if guess == secret:\n        return 'You win!'\n    return 'Try again!'",
+                question: "What happens if the player guesses 7?",
+                options: ["The game ends", "The function returns 'You win!'", "The function returns 'Try again!'"],
+                correct: "B"
+            },
+            {
+                story: "Professor Python says: 'Functions are the building blocks of Python programs!'",
+                code: "def main():\n    print('Program starting...')\n    result = calculate(5, 3)\n    print('Result:', result)\n\nif __name__ == '__main__':\n    main()",
+                question: "Which function is called when the program runs?",
+                options: ["calculate", "print", "main"],
+                correct: "C"
+            }
+        ];
+
+        // Game state
+        let currentQuestion = 0;
+        let score = 0;
+        let answered = false;
+        let musicPlaying = false;
+
+        // DOM elements
+        const startScreen = document.getElementById('start-screen');
+        const questionScreen = document.getElementById('question-screen');
+        const endScreen = document.getElementById('end-screen');
+        const startBtn = document.getElementById('start-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const playAgainBtn = document.getElementById('play-again-btn');
+        const saveScoreBtn = document.getElementById('save-score-btn');
+        const storyText = document.getElementById('story-text');
+        const codeExample = document.getElementById('code-example');
+        const options = document.querySelectorAll('.option');
+        const feedback = document.getElementById('feedback');
+        const scoreDisplay = document.getElementById('score-display');
+        const finalScore = document.getElementById('final-score');
+        const playerName = document.getElementById('player-name');
+        const rankingList = document.getElementById('ranking-list');
+        const musicControl = document.getElementById('music-control');
+        const backgroundMusic = document.getElementById('background-music');
+
+        // Initialize the game
+        function initGame() {
+            // Event listeners
+            startBtn.addEventListener('click', startGame);
+            nextBtn.addEventListener('click', nextQuestion);
+            playAgainBtn.addEventListener('click', restartGame);
+            saveScoreBtn.addEventListener('click', saveScore);
+            musicControl.addEventListener('click', toggleMusic);
+            
+            // Option buttons
+            options.forEach(option => {
+                option.addEventListener('click', function() {
+                    if (!answered) {
+                        checkAnswer(this.dataset.option);
+                    }
+                });
+            });
+            
+            // Load rankings
+            loadRankings();
+        }
+
+        // Start the game
+        function startGame() {
+            startScreen.style.display = 'none';
+            questionScreen.style.display = 'flex';
+            showQuestion();
+        }
+
+        // Show current question
+        function showQuestion() {
+            const question = questions[currentQuestion];
+            document.getElementById('question-title').textContent = `Question ${currentQuestion + 1}`;
+            storyText.innerHTML = question.story;
+            codeExample.textContent = question.code;
+            
+            // Set options
+            options.forEach((option, index) => {
+                option.textContent = `${String.fromCharCode(65 + index)}. ${question.options[index]}`;
+            });
+            
+            // Reset state
+            answered = false;
+            feedback.textContent = '';
+            feedback.className = 'feedback';
+            nextBtn.style.display = 'none';
+            scoreDisplay.textContent = score;
+        }
+
+        // Check answer
+        function checkAnswer(selected) {
+            answered = true;
+            const question = questions[currentQuestion];
+            
+            if (selected === question.correct) {
+                feedback.textContent = 'Correct! Great job! 🎉';
+                feedback.className = 'feedback correct';
+                score++;
+                scoreDisplay.textContent = score;
+            } else {
+                feedback.textContent = `Not quite. The correct answer is ${question.correct}.`;
+                feedback.className = 'feedback incorrect';
+            }
+            
+            nextBtn.style.display = 'block';
+        }
+
+        // Next question
+        function nextQuestion() {
+            currentQuestion++;
+            
+            if (currentQuestion < questions.length) {
+                showQuestion();
+            } else {
+                endGame();
+            }
+        }
+
+        // End game
+        function endGame() {
+            questionScreen.style.display = 'none';
+            endScreen.style.display = 'flex';
+            finalScore.textContent = score;
+            loadRankings();
+        }
+
+        // Restart game
+        function restartGame() {
+            currentQuestion = 0;
+            score = 0;
+            endScreen.style.display = 'none';
+            startScreen.style.display = 'flex';
+            playerName.value = '';
+        }
+
+        // Save score
+        function saveScore() {
+            const name = playerName.value.trim() || 'Anonymous';
+            const rankings = JSON.parse(localStorage.getItem('pythonFunctionsRankings') || '[]');
+            
+            rankings.push({ name, score });
+            
+            // Sort by score (descending) and keep top 10
+            rankings.sort((a, b) => b.score - a.score);
+            if (rankings.length > 10) {
+                rankings.length = 10;
+            }
+            
+            localStorage.setItem('pythonFunctionsRankings', JSON.stringify(rankings));
+            loadRankings();
+        }
+
+        // Load rankings
+        function loadRankings() {
+            const rankings = JSON.parse(localStorage.getItem('pythonFunctionsRankings') || '[]');
+            rankingList.innerHTML = '';
+            
+            rankings.forEach((entry, index) => {
+                const li = document.createElement('li');
+                li.innerHTML = `<span>${index + 1}. ${entry.name}</span><span>${entry.score} points</span>`;
+                rankingList.appendChild(li);
+            });
+        }
+
+        // Toggle background music
+        function toggleMusic() {
+            if (musicPlaying) {
+                backgroundMusic.pause();
+                musicControl.textContent = '🔇';
+            } else {
+                backgroundMusic.play().catch(e => {
+                    console.log('Audio play failed:', e);
+                    // If the provided music URL fails, we'll use a fallback
+                    alert("Background music couldn't load. The game will continue without music.");
+                });
+                musicControl.textContent = '🔊';
+            }
+            musicPlaying = !musicPlaying;
+        }
+
+        // Initialize the game when the page loads
+        window.onload = initGame;
+    </script>
+</body>
+</html>
 
